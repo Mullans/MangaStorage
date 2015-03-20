@@ -23,9 +23,47 @@
 }
 
 -(void)addingWindow:(AddingWindow *)addingWindow addedManga:(Manga *)manga{
-    [manga print];
+    if([titles containsObject:[manga getTitle]]){
+        [self failAlert];
+        return;
+    }
+    [titles addObject:[manga getTitle]];
     [mangaList addObject:manga];
     [_tableView reloadData];
+}
+
+-(void)closingWindow{
+    
+}
+
+-(void)failAlert{
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"Continue"];
+    [alert setMessageText:@"New Manga Already Exists"];
+    [alert setInformativeText:@"The manga you tried to add is already in your library."];
+    [alert setAlertStyle:NSCriticalAlertStyle];
+    [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+}
+
+- (IBAction)updateItemSelect:(id)sender {
+    NSIndexSet *indexSet = [_tableView selectedRowIndexes];
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+        //use index
+        [[mangaList objectAtIndex:index]updateChapters];
+        NSLog(@"%lu",index);
+    }];
+    
+}
+
+- (IBAction)updateAllItemSelect:(id)sender {
+    for(Manga *item in mangaList){
+        [item updateChapters];
+    }
+}
+
+- (IBAction)newMenuItemSelect:(id)sender {
+    addWindow = [[AddingWindow alloc]init];
+    addWindow.delegate = self;
 }
 
 - (IBAction)viewItemSelect:(id)sender {
@@ -127,12 +165,28 @@
     widths = @[@6,@4,@4,@4,@3,@4,@3];
     columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
     possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
+    
+    //add code to initialize titles
+    titles = [[NSMutableArray alloc]initWithCapacity:10];
+    
+    
     [self updateTableColumns];
 }
 
 -(void)rowDoubleClicked{
-    mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]]];
+    @try{
+        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self];
+    }@catch(NSException *e){
+        NSLog(@"Didn't click on row");
+    }
+
+        
     //mangaWindow.delegate = self;
+}
+
+-(void)windowWillClose:(NSNotification *)notification{
+    NSLog(@"Window closed");
+    [_tableView reloadData];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -181,7 +235,7 @@
             result.textField.stringValue = @"Ongoing";
         }
     }else if(columnIndex==6){
-        result.textField.stringValue = @"TBD";
+        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumberToRead]];
     }
     return result;
 }

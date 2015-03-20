@@ -14,13 +14,14 @@
 //TODO: make shown categories customizable
 //TODO: IMPORTANT implement coredata
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate, AddingWindowDelegate>{
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate, AddingWindowDelegate, NSWindowDelegate>{
     NSMutableArray *mangaList;
     AddingWindow *addWindow;
     MangaWindow *mangaWindow;
     NSMutableArray *columnOptions;
     NSArray *possibleOptions;
     NSArray *widths;
+    NSMutableArray *titles;
 }
 @property (weak) IBOutlet NSMenuItem *titleMenu;
 @property (weak) IBOutlet NSMenuItem *authorMenu;
@@ -36,8 +37,13 @@
 @property (weak) IBOutlet NSScrollView *scrollView;
 @property (weak) IBOutlet NSTableView *tableView;
 
+
+- (IBAction)updateItemSelect:(id)sender;
+- (IBAction)updateAllItemSelect:(id)sender;
+- (IBAction)newMenuItemSelect:(id)sender;
 - (IBAction)viewItemSelect:(id)sender;
 -(void)rowDoubleClicked;
 -(void)updateTableColumns;
+-(void)failAlert;
 @end
 

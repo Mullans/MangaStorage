@@ -25,7 +25,7 @@
 
 -(id)initWithURL:(NSURL*)mangaURL{
     self = [super init];
-    
+    mangaHomePage = mangaURL;
     //tenmanga.com
     /*
     NSString *imgString = @"(<meta property=\"og:image\" content=\"http://img.mangayes.com/files/img/logo/)([0-9]*?)(/)([0-9]*?)(.jpg)";
@@ -63,7 +63,6 @@
     NSString *updatedCheck;
     
     NSString *tableSearchString;
-    NSArray *tempChapterList = @[];
     
     NSString *html = [NSString stringWithContentsOfURL:mangaURL encoding:NSUTF8StringEncoding error:nil];
     
@@ -100,12 +99,22 @@
         NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"(:)(.*?)(</td>)"
                                                                                     options:NSRegularExpressionCaseInsensitive
                                                                                       error:nil];
+        NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
+                                                                                          options:NSRegularExpressionCaseInsensitive
+                                                                                            error:nil];
         tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
         for(NSString *item in tableArray){
             NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
             chapterRange.location+=2;
             chapterRange.length-=7;
             NSString *chapterTitle = [item substringWithRange:chapterRange];
+            
+            NSRange chapterURLRange = [chapterURLFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterURLRange.location+=9;
+            chapterURLRange.length-=11;
+            NSString *chapterURLString = [item substringWithRange:chapterURLRange];
+            NSURL *chapterURL = [[NSURL alloc]initWithString:[@"http://www.mangareader.net" stringByAppendingString:chapterURLString]];
+            
             if([chapterTitle isEqualToString:@""]){
                 NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"([0-9]\">)(.*?)(</a>)"
                                                                           options:NSRegularExpressionCaseInsensitive
@@ -115,10 +124,11 @@
                 chapterRange.length-=7;
                 chapterTitle = [item substringWithRange:chapterRange];
             }
-            [chapterArray addObject:@[chapterTitle,@false]];
+            [chapterArray addObject:@[chapterTitle,@false,chapterURL]];
         }
         chapterList = chapterArray;
         chapterTotal = (NSInteger)chapterArray.count;
+        chaptersToRead = chapterTotal;
     }
     
     
@@ -173,7 +183,6 @@
     completedRange.location+=addToCompletedRange;
     completedRange.length-=subFromCompletedLength;
     
-    NSLog([html substringWithRange:completedRange]);
     if ([[html substringWithRange:completedRange] isEqualToString:updatedCheck]){
         finished = NO;
     }else{
@@ -184,6 +193,62 @@
     
     return self;
 }
+-(void)updateChapters{
+    NSString *html = [NSString stringWithContentsOfURL:mangaHomePage encoding:NSUTF8StringEncoding error:nil];
+
+    
+    if ([host isEqualTo:@"MangaReader.net"]){
+        NSString *tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
+        NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:tableSearchString
+                                                                                    options:NSRegularExpressionDotMatchesLineSeparators
+                                                                                      error:nil];
+        NSRange tableRange = [tableRegex rangeOfFirstMatchInString:html options:NSMatchingReportProgress range:NSMakeRange(0, html.length)];
+        tableRange.location+=20;
+        tableRange.length-=7;
+        NSArray *tableArray = [[html substringWithRange:tableRange] componentsSeparatedByString:@"<tr>"];
+        NSMutableArray *chapterArray = [[NSMutableArray alloc]initWithCapacity:10];
+        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"(:)(.*?)(</td>)"
+                                                                                       options:NSRegularExpressionCaseInsensitive
+                                                                                         error:nil];
+        NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
+                                                                                          options:NSRegularExpressionCaseInsensitive
+                                                                                            error:nil];
+        
+        tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
+        for(NSString *item in tableArray){
+            NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterRange.location+=2;
+            chapterRange.length-=7;
+            NSString *chapterTitle = [item substringWithRange:chapterRange];
+            
+            NSRange chapterURLRange = [chapterURLFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterURLRange.location+=9;
+            chapterURLRange.length-=11;
+            NSString *chapterURLString = [item substringWithRange:chapterURLRange];
+            NSURL *chapterURL = [[NSURL alloc]initWithString:[@"http://www.mangareader.net" stringByAppendingString:chapterURLString]];
+            
+            if([chapterTitle isEqualToString:@""]){
+                NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"([0-9]\">)(.*?)(</a>)"
+                                                                                                options:NSRegularExpressionCaseInsensitive
+                                                                                                  error:nil];
+                chapterRange = [chapterFinder2 rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+                chapterRange.location+=3;
+                chapterRange.length-=7;
+                chapterTitle = [item substringWithRange:chapterRange];
+            }
+            [chapterArray addObject:@[chapterTitle,@false,chapterURL]];
+        }
+        for(NSArray *item in chapterList){
+            NSUInteger chapterIndex =[chapterArray indexOfObject:@[item[0],@false,item[2]]];
+            if(chapterIndex != NSNotFound){
+                [chapterArray replaceObjectAtIndex:chapterIndex withObject:item];
+            }
+        }
+        chapterList = chapterArray;
+        chapterTotal = (NSInteger)chapterArray.count;
+    }
+}
+
 -(void)print{
     NSLog(@"%@\n%@\n%hhd",title,author,finished);
 }
@@ -218,7 +283,17 @@
 -(void)switchRead:(int)index{
     NSArray *item = [chapterList objectAtIndex:index];
     NSNumber *read = @(([item[1] integerValue]+1)%2);
-    [chapterList replaceObjectAtIndex:index withObject:@[item[0],read]];
+    if ([read  isEqual: @0]){
+        chaptersToRead++;
+    }else{
+        chaptersToRead--;
+    }
+    [chapterList replaceObjectAtIndex:index withObject:@[item[0],read,item[2]]];
 }
-
+-(NSInteger)getNumberToRead{
+    return chaptersToRead;
+}
+-(NSURL *)getChapterURL:(int)index{
+    return [chapterList objectAtIndex:index][2];
+}
 @end

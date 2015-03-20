@@ -20,6 +20,8 @@
     NSMutableArray *chapterList;
     NSImage* coverArt; //
     BOOL finished;
+    NSURL *mangaHomePage;
+    NSInteger chaptersToRead;
 }
 
 -(id)initWithURL:(NSURL*)mangaURL;
@@ -31,8 +33,10 @@
 -(NSArray*)getChapterList;
 -(NSArray*)getChapter:(int)index;
 -(NSInteger)getNumChapters;
+-(NSInteger)getNumberToRead;
 -(void)switchRead:(int)index;
-
+-(NSURL*)getChapterURL:(int)index;
+-(void)updateChapters;
 -(NSImage*)getCover;
 -(void)print;
 @end

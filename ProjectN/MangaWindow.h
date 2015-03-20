@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "Manga.h"
 
+@protocol MangaWindowDelegate;
+
 @interface MangaWindow : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>{
     Manga* myManga;
 }
@@ -20,7 +22,15 @@
 @property (weak) IBOutlet NSScrollView *scrollView;
 @property (weak) IBOutlet NSTableView *tableView;
 @property (weak) IBOutlet NSImageView *coverImage;
+@property (weak) IBOutlet NSTextField *numToRead;
 
--(id)initWithManga:(Manga*)newManga;
+- (IBAction)getUpdates:(id)sender;
+-(id)initWithManga:(Manga*)newManga parent:(id)parent;
 -(void)rowDoubleClicked;
+@end
+
+@protocol MangaWindowDelegate <NSObject>
+
+-(void)closingWindow;
+
 @end

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		3D0CACFD1AA627A3007DAE8D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CACFC1AA627A3007DAE8D /* AppDelegate.m */; };
 		3D0CACFF1AA627A3007DAE8D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CACFE1AA627A3007DAE8D /* main.m */; };
-		3D0CAD021AA627A3007DAE8D /* MangaStorage.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */; };
+		3D0CAD021AA627A3007DAE8D /* ProjectN.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */; };
 		3D0CAD041AA627A3007DAE8D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD031AA627A3007DAE8D /* Images.xcassets */; };
 		3D0CAD071AA627A3007DAE8D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD051AA627A3007DAE8D /* MainMenu.xib */; };
 		3D0CAD131AA627A3007DAE8D /* ProjectNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD121AA627A3007DAE8D /* ProjectNTests.m */; };
@@ -37,7 +37,7 @@
 		3D0CACFB1AA627A3007DAE8D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D0CACFC1AA627A3007DAE8D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3D0CACFE1AA627A3007DAE8D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MangaStorage.xcdatamodel; sourceTree = "<group>"; };
+		3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProjectN.xcdatamodel; sourceTree = "<group>"; };
 		3D0CAD031AA627A3007DAE8D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3D0CAD061AA627A3007DAE8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3D0CAD0C1AA627A3007DAE8D /* MangaStorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MangaStorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,7 +106,7 @@
 				3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */,
 				3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */,
 				3D0CAD211AA631F5007DAE8D /* qmsmall.png */,
-				3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */,
+				3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */,
 				3D0CACF91AA627A3007DAE8D /* Supporting Files */,
 			);
 			name = MangaStorage;
@@ -245,7 +245,7 @@
 				3DEB3D131ABBE6B3000A51CE /* MangaWindow.m in Sources */,
 				3DFBA51D1AAC050200F7EDFD /* Manga.m in Sources */,
 				3D0CAD1F1AA63056007DAE8D /* AddingWindow.m in Sources */,
-				3D0CAD021AA627A3007DAE8D /* MangaStorage.xcdatamodeld in Sources */,
+				3D0CAD021AA627A3007DAE8D /* ProjectN.xcdatamodeld in Sources */,
 				3D0CACFF1AA627A3007DAE8D /* main.m in Sources */,
 				3D0CACFD1AA627A3007DAE8D /* AppDelegate.m in Sources */,
 			);
@@ -448,13 +448,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */ = {
+		3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */,
+				3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */,
 			);
-			currentVersion = 3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */;
-			path = MangaStorage.xcdatamodeld;
+			currentVersion = 3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */;
+			path = ProjectN.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

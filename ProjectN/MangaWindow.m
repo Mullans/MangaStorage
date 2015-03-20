@@ -19,14 +19,19 @@
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
--(id)initWithManga:(Manga*)newManga{
+- (IBAction)getUpdates:(id)sender {
+    [myManga updateChapters];
+    [_tableView reloadData];
+}
+
+-(id)initWithManga:(Manga*)newManga parent:(id)parent{
     self = [super initWithWindowNibName:@"MangaWindow"];
     [self.window makeKeyAndOrderFront:self];
     [self.window makeMainWindow];
     
     _tableView.dataSource = self;
     _tableView.delegate = self;
-    
+    self.window.delegate = parent;
     myManga = newManga;
     
     [self.window setTitle:[newManga getTitle]];
@@ -38,6 +43,9 @@
     
     [_artist setStringValue:[@"Artist: " stringByAppendingString:[newManga getArtist]]];
     [_artist sizeToFit];
+    
+    [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%i",(int)[newManga getNumberToRead]]]];
+    [_numToRead sizeToFit];
     
     if ([newManga getAuthor]){
         [_status setStringValue:@"Status: Ongoing"];
@@ -62,8 +70,18 @@
 
 -(void)rowDoubleClicked{
     
-    [myManga switchRead:[_tableView clickedRow]];
-    [_tableView reloadData];
+    
+    
+    NSUInteger flags = [NSEvent modifierFlags];// & NSDeviceIndependentModifierFlagsMask;
+    if( flags == NSShiftKeyMask ){
+        NSURL* chapterURL = [myManga getChapterURL:[_tableView clickedRow]];
+        [[NSWorkspace sharedWorkspace] openURL: chapterURL];
+    } else {
+        [myManga switchRead:[_tableView clickedRow]];
+        [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%i",(int)[myManga getNumberToRead]]]];
+        [_numToRead sizeToFit];
+        [_tableView reloadData];
+    }
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
