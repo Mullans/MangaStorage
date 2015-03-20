@@ -11,19 +11,186 @@
 @interface AppDelegate ()
 
 @property (weak) IBOutlet NSWindow *window;
-- (IBAction)saveAction:(id)sender;
 
 @end
 
 @implementation AppDelegate
 
+
+- (IBAction)addButton:(id)sender {
+    addWindow = [[AddingWindow alloc]init];
+    addWindow.delegate = self;
+}
+
+-(void)addingWindow:(AddingWindow *)addingWindow addedManga:(Manga *)manga{
+    [manga print];
+    [mangaList addObject:manga];
+    [_tableView reloadData];
+}
+
+- (IBAction)viewItemSelect:(id)sender {
+    if ([[sender title] rangeOfString:@"Hide"].location == NSNotFound) {
+        if (sender==_titleMenu){
+            [columnOptions replaceObjectAtIndex:0 withObject:@1];
+            _titleMenu.title = @"Hide Title";
+        }else if(sender==_authorMenu){
+            [columnOptions replaceObjectAtIndex:1 withObject:@1];
+            _authorMenu.title = @"Hide Author";
+        }else if(sender==_artistMenu){
+            [columnOptions replaceObjectAtIndex:2 withObject:@1];
+            _artistMenu.title = @"Hide Artist";
+        }else if(sender==_hostingMenu){
+            [columnOptions replaceObjectAtIndex:3 withObject:@1];
+            _hostingMenu.title = @"Hide Hosting Site";
+        }else if(sender==_numberMenu){
+            [columnOptions replaceObjectAtIndex:4 withObject:@1];
+            _numberMenu.title = @"Hide Number of Chapters";
+        }else if(sender==_statusMenu){
+            [columnOptions replaceObjectAtIndex:5 withObject:@1];
+            _statusMenu.title = @"Hide Current Status";
+        }else if (sender==_updatesMenu){
+            [columnOptions replaceObjectAtIndex:6 withObject:@1];
+            _updatesMenu.title = @"Hide New Updates";
+        }
+    }else{
+        if (sender==_titleMenu){
+            [columnOptions replaceObjectAtIndex:0 withObject:@0];
+            _titleMenu.title = @"Show Title";
+        }else if(sender==_authorMenu){
+            [columnOptions replaceObjectAtIndex:1 withObject:@0];
+            _authorMenu.title = @"Show Author";
+        }else if(sender==_artistMenu){
+            [columnOptions replaceObjectAtIndex:2 withObject:@0];
+            _artistMenu.title = @"Show Artist";
+        }else if(sender==_hostingMenu){
+            [columnOptions replaceObjectAtIndex:3 withObject:@0];
+            _hostingMenu.title = @"Show Hosting Site";
+        }else if(sender==_numberMenu){
+            [columnOptions replaceObjectAtIndex:4 withObject:@0];
+            _numberMenu.title = @"Show Number of Chapters";
+        }else if(sender==_statusMenu){
+            [columnOptions replaceObjectAtIndex:5 withObject:@0];
+            _statusMenu.title = @"Show Current Status";
+        }else if (sender==_updatesMenu){
+            [columnOptions replaceObjectAtIndex:6 withObject:@0];
+            _updatesMenu.title = @"Show New Updates";
+        }
+    }
+    [self updateTableColumns];
+}
+
+-(void)updateTableColumns{
+    //makes sure the appropriate columns are present
+    int total = 0;
+    for(int i = 0; i<columnOptions.count; i++){
+        int columnIndex = (int)[_tableView columnWithIdentifier:possibleOptions[i]];
+        if([columnOptions[i] integerValue]==1){
+            total+=[widths[i] integerValue];
+            if(columnIndex==-1){
+                NSTableColumn *newColumn = [[NSTableColumn alloc]initWithIdentifier:possibleOptions[i]];
+                [[newColumn headerCell]setStringValue:possibleOptions[i]];
+                
+                int j = 3;
+                j++;
+                
+                [_tableView addTableColumn:newColumn];
+            }
+        }else{
+            if(columnIndex != -1){
+                [_tableView removeTableColumn:[_tableView tableColumnWithIdentifier:possibleOptions[i]]];
+            }
+        }
+    }
+    //rearranges and resizes columns
+    int index = 0;
+    for(int i = 0; i<columnOptions.count; i++){
+        if([columnOptions[i] integerValue]==1){
+            int columnID = (int)[_tableView columnWithIdentifier:possibleOptions[i]];
+            [_tableView moveColumn:columnID toColumn:index];
+            index++;
+            float columnWidth = ([widths[i] floatValue]/total)*_tableView.window.frame.size.width-13;
+            [[_tableView tableColumnWithIdentifier:possibleOptions[i]]  setWidth:columnWidth];
+        }
+    }
+    
+}
+
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    mangaList = [[NSMutableArray alloc]initWithCapacity:10];
+//    Manga *item = [[Manga alloc]init];
+//    [mangaList addObject:item];
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    [_tableView setDoubleAction:@selector(rowDoubleClicked)];
+    widths = @[@6,@4,@4,@4,@3,@4,@3];
+    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
+    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
+    [self updateTableColumns];
+}
+
+-(void)rowDoubleClicked{
+    mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]]];
+    //mangaWindow.delegate = self;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
 }
+
+//clicked on columnheader
+-(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
+    NSLog(@"Sort based on header TBD");
+}
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
+    return mangaList.count;
+}
+
+
+//if images, height 50, else text height (change in actual table?)
+-(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
+    NSTableCellView *result = [tableView makeViewWithIdentifier:@"tableView" owner:self];
+    
+    if (result==nil){
+        result = [[NSTableCellView alloc]initWithFrame:NSMakeRect(0,0,tableView.bounds.size.width,[tableView rowHeight])];
+    }
+    NSTextField *cellTF = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, tableColumn.width, result.bounds.size.height)];
+    [result addSubview:cellTF];
+    result.textField = cellTF;
+    [cellTF setBordered:NO];
+    [cellTF setEditable:NO];
+    [cellTF setDrawsBackground:NO];
+    Manga* manga = [mangaList objectAtIndex:row];
+    int columnIndex = [possibleOptions indexOfObject:tableColumn.identifier];
+    if (columnIndex==0){
+        result.textField.stringValue = [manga getTitle];
+    }else if(columnIndex==1){
+        result.textField.stringValue = [manga getAuthor];
+    }else if(columnIndex==2){
+        result.textField.stringValue = [manga getArtist];
+    }else if(columnIndex==3){
+        result.textField.stringValue = [manga getHost];
+    }else if(columnIndex==4){
+        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumChapters]];
+    }else if (columnIndex==5){
+        if([manga getStatus]==true){
+            result.textField.stringValue = @"Completed";
+        }else{
+            result.textField.stringValue = @"Ongoing";
+        }
+    }else if(columnIndex==6){
+        result.textField.stringValue = @"TBD";
+    }
+    return result;
+}
+
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
+    return YES;
+}
+
+
 
 #pragma mark - Core Data stack
 

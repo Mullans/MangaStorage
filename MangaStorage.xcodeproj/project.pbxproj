@@ -9,10 +9,16 @@
 /* Begin PBXBuildFile section */
 		3D0CACFD1AA627A3007DAE8D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CACFC1AA627A3007DAE8D /* AppDelegate.m */; };
 		3D0CACFF1AA627A3007DAE8D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CACFE1AA627A3007DAE8D /* main.m */; };
-		3D0CAD021AA627A3007DAE8D /* ProjectN.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */; };
+		3D0CAD021AA627A3007DAE8D /* MangaStorage.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */; };
 		3D0CAD041AA627A3007DAE8D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD031AA627A3007DAE8D /* Images.xcassets */; };
 		3D0CAD071AA627A3007DAE8D /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD051AA627A3007DAE8D /* MainMenu.xib */; };
 		3D0CAD131AA627A3007DAE8D /* ProjectNTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD121AA627A3007DAE8D /* ProjectNTests.m */; };
+		3D0CAD1F1AA63056007DAE8D /* AddingWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */; };
+		3D0CAD201AA63056007DAE8D /* AddingWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */; };
+		3D0CAD221AA631F5007DAE8D /* qmsmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD211AA631F5007DAE8D /* qmsmall.png */; };
+		3DEB3D131ABBE6B3000A51CE /* MangaWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEB3D111ABBE6B3000A51CE /* MangaWindow.m */; };
+		3DEB3D141ABBE6B3000A51CE /* MangaWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3DEB3D121ABBE6B3000A51CE /* MangaWindow.xib */; };
+		3DFBA51D1AAC050200F7EDFD /* Manga.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DFBA51C1AAC050200F7EDFD /* Manga.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,17 +32,26 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3D0CACF61AA627A3007DAE8D /* ProjectN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectN.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D0CACF61AA627A3007DAE8D /* MangaStorage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MangaStorage.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D0CACFA1AA627A3007DAE8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D0CACFB1AA627A3007DAE8D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3D0CACFC1AA627A3007DAE8D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		3D0CACFE1AA627A3007DAE8D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProjectN.xcdatamodel; sourceTree = "<group>"; };
+		3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MangaStorage.xcdatamodel; sourceTree = "<group>"; };
 		3D0CAD031AA627A3007DAE8D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		3D0CAD061AA627A3007DAE8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
-		3D0CAD0C1AA627A3007DAE8D /* ProjectNTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProjectNTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D0CAD0C1AA627A3007DAE8D /* MangaStorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MangaStorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D0CAD111AA627A3007DAE8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D0CAD121AA627A3007DAE8D /* ProjectNTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProjectNTests.m; sourceTree = "<group>"; };
+		3D0CAD1C1AA63056007DAE8D /* AddingWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddingWindow.h; sourceTree = "<group>"; };
+		3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddingWindow.m; sourceTree = "<group>"; };
+		3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddingWindow.xib; sourceTree = "<group>"; };
+		3D0CAD211AA631F5007DAE8D /* qmsmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = qmsmall.png; path = ../../qmsmall.png; sourceTree = "<group>"; };
+		3DEB3D101ABBE6B3000A51CE /* MangaWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MangaWindow.h; sourceTree = "<group>"; };
+		3DEB3D111ABBE6B3000A51CE /* MangaWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MangaWindow.m; sourceTree = "<group>"; };
+		3DEB3D121ABBE6B3000A51CE /* MangaWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MangaWindow.xib; sourceTree = "<group>"; };
+		3DFBA51B1AAC050200F7EDFD /* Manga.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manga.h; sourceTree = "<group>"; };
+		3DFBA51C1AAC050200F7EDFD /* Manga.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Manga.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +75,8 @@
 		3D0CACED1AA627A2007DAE8D = {
 			isa = PBXGroup;
 			children = (
-				3D0CACF81AA627A3007DAE8D /* ProjectN */,
-				3D0CAD0F1AA627A3007DAE8D /* ProjectNTests */,
+				3D0CACF81AA627A3007DAE8D /* MangaStorage */,
+				3D0CAD0F1AA627A3007DAE8D /* MangaStorageTests */,
 				3D0CACF71AA627A3007DAE8D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -69,22 +84,32 @@
 		3D0CACF71AA627A3007DAE8D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3D0CACF61AA627A3007DAE8D /* ProjectN.app */,
-				3D0CAD0C1AA627A3007DAE8D /* ProjectNTests.xctest */,
+				3D0CACF61AA627A3007DAE8D /* MangaStorage.app */,
+				3D0CAD0C1AA627A3007DAE8D /* MangaStorageTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3D0CACF81AA627A3007DAE8D /* ProjectN */ = {
+		3D0CACF81AA627A3007DAE8D /* MangaStorage */ = {
 			isa = PBXGroup;
 			children = (
+				3DEB3D101ABBE6B3000A51CE /* MangaWindow.h */,
+				3DEB3D111ABBE6B3000A51CE /* MangaWindow.m */,
+				3DEB3D121ABBE6B3000A51CE /* MangaWindow.xib */,
 				3D0CACFB1AA627A3007DAE8D /* AppDelegate.h */,
 				3D0CACFC1AA627A3007DAE8D /* AppDelegate.m */,
 				3D0CAD031AA627A3007DAE8D /* Images.xcassets */,
 				3D0CAD051AA627A3007DAE8D /* MainMenu.xib */,
-				3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */,
+				3DFBA51B1AAC050200F7EDFD /* Manga.h */,
+				3DFBA51C1AAC050200F7EDFD /* Manga.m */,
+				3D0CAD1C1AA63056007DAE8D /* AddingWindow.h */,
+				3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */,
+				3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */,
+				3D0CAD211AA631F5007DAE8D /* qmsmall.png */,
+				3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */,
 				3D0CACF91AA627A3007DAE8D /* Supporting Files */,
 			);
+			name = MangaStorage;
 			path = ProjectN;
 			sourceTree = "<group>";
 		};
@@ -97,12 +122,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		3D0CAD0F1AA627A3007DAE8D /* ProjectNTests */ = {
+		3D0CAD0F1AA627A3007DAE8D /* MangaStorageTests */ = {
 			isa = PBXGroup;
 			children = (
 				3D0CAD121AA627A3007DAE8D /* ProjectNTests.m */,
 				3D0CAD101AA627A3007DAE8D /* Supporting Files */,
 			);
+			name = MangaStorageTests;
 			path = ProjectNTests;
 			sourceTree = "<group>";
 		};
@@ -117,9 +143,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3D0CACF51AA627A3007DAE8D /* ProjectN */ = {
+		3D0CACF51AA627A3007DAE8D /* MangaStorage */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3D0CAD161AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "ProjectN" */;
+			buildConfigurationList = 3D0CAD161AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "MangaStorage" */;
 			buildPhases = (
 				3D0CACF21AA627A3007DAE8D /* Sources */,
 				3D0CACF31AA627A3007DAE8D /* Frameworks */,
@@ -129,14 +155,14 @@
 			);
 			dependencies = (
 			);
-			name = ProjectN;
+			name = MangaStorage;
 			productName = ProjectN;
-			productReference = 3D0CACF61AA627A3007DAE8D /* ProjectN.app */;
+			productReference = 3D0CACF61AA627A3007DAE8D /* MangaStorage.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3D0CAD0B1AA627A3007DAE8D /* ProjectNTests */ = {
+		3D0CAD0B1AA627A3007DAE8D /* MangaStorageTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3D0CAD191AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "ProjectNTests" */;
+			buildConfigurationList = 3D0CAD191AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "MangaStorageTests" */;
 			buildPhases = (
 				3D0CAD081AA627A3007DAE8D /* Sources */,
 				3D0CAD091AA627A3007DAE8D /* Frameworks */,
@@ -147,9 +173,9 @@
 			dependencies = (
 				3D0CAD0E1AA627A3007DAE8D /* PBXTargetDependency */,
 			);
-			name = ProjectNTests;
+			name = MangaStorageTests;
 			productName = ProjectNTests;
-			productReference = 3D0CAD0C1AA627A3007DAE8D /* ProjectNTests.xctest */;
+			productReference = 3D0CAD0C1AA627A3007DAE8D /* MangaStorageTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -170,7 +196,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3D0CACF11AA627A3007DAE8D /* Build configuration list for PBXProject "ProjectN" */;
+			buildConfigurationList = 3D0CACF11AA627A3007DAE8D /* Build configuration list for PBXProject "MangaStorage" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -183,8 +209,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3D0CACF51AA627A3007DAE8D /* ProjectN */,
-				3D0CAD0B1AA627A3007DAE8D /* ProjectNTests */,
+				3D0CACF51AA627A3007DAE8D /* MangaStorage */,
+				3D0CAD0B1AA627A3007DAE8D /* MangaStorageTests */,
 			);
 		};
 /* End PBXProject section */
@@ -194,7 +220,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DEB3D141ABBE6B3000A51CE /* MangaWindow.xib in Resources */,
 				3D0CAD041AA627A3007DAE8D /* Images.xcassets in Resources */,
+				3D0CAD221AA631F5007DAE8D /* qmsmall.png in Resources */,
+				3D0CAD201AA63056007DAE8D /* AddingWindow.xib in Resources */,
 				3D0CAD071AA627A3007DAE8D /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -213,7 +242,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D0CAD021AA627A3007DAE8D /* ProjectN.xcdatamodeld in Sources */,
+				3DEB3D131ABBE6B3000A51CE /* MangaWindow.m in Sources */,
+				3DFBA51D1AAC050200F7EDFD /* Manga.m in Sources */,
+				3D0CAD1F1AA63056007DAE8D /* AddingWindow.m in Sources */,
+				3D0CAD021AA627A3007DAE8D /* MangaStorage.xcdatamodeld in Sources */,
 				3D0CACFF1AA627A3007DAE8D /* main.m in Sources */,
 				3D0CACFD1AA627A3007DAE8D /* AppDelegate.m in Sources */,
 			);
@@ -232,7 +264,7 @@
 /* Begin PBXTargetDependency section */
 		3D0CAD0E1AA627A3007DAE8D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3D0CACF51AA627A3007DAE8D /* ProjectN */;
+			target = 3D0CACF51AA627A3007DAE8D /* MangaStorage */;
 			targetProxy = 3D0CAD0D1AA627A3007DAE8D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -332,7 +364,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = ProjectN/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MangaStorage;
 			};
 			name = Debug;
 		};
@@ -343,7 +375,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = ProjectN/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = MangaStorage;
 			};
 			name = Release;
 		};
@@ -362,8 +394,8 @@
 				);
 				INFOPLIST_FILE = ProjectNTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProjectN.app/Contents/MacOS/ProjectN";
+				PRODUCT_NAME = MangaStorageTests;
+				TEST_HOST = "";
 			};
 			name = Debug;
 		};
@@ -378,15 +410,15 @@
 				);
 				INFOPLIST_FILE = ProjectNTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProjectN.app/Contents/MacOS/ProjectN";
+				PRODUCT_NAME = MangaStorageTests;
+				TEST_HOST = "";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3D0CACF11AA627A3007DAE8D /* Build configuration list for PBXProject "ProjectN" */ = {
+		3D0CACF11AA627A3007DAE8D /* Build configuration list for PBXProject "MangaStorage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3D0CAD141AA627A3007DAE8D /* Debug */,
@@ -395,32 +427,34 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3D0CAD161AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "ProjectN" */ = {
+		3D0CAD161AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "MangaStorage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3D0CAD171AA627A3007DAE8D /* Debug */,
 				3D0CAD181AA627A3007DAE8D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		3D0CAD191AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "ProjectNTests" */ = {
+		3D0CAD191AA627A3007DAE8D /* Build configuration list for PBXNativeTarget "MangaStorageTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3D0CAD1A1AA627A3007DAE8D /* Debug */,
 				3D0CAD1B1AA627A3007DAE8D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */ = {
+		3D0CAD001AA627A3007DAE8D /* MangaStorage.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */,
+				3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */,
 			);
-			currentVersion = 3D0CAD011AA627A3007DAE8D /* ProjectN.xcdatamodel */;
-			path = ProjectN.xcdatamodeld;
+			currentVersion = 3D0CAD011AA627A3007DAE8D /* MangaStorage.xcdatamodel */;
+			path = MangaStorage.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
