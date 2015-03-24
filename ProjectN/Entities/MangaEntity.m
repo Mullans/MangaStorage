@@ -67,6 +67,8 @@
         updatedCheck = @"Ongoing";
         
         
+        
+        
         tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
         NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:tableSearchString
                                                                                     options:NSRegularExpressionDotMatchesLineSeparators
@@ -82,8 +84,9 @@
         NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
                                                                                           options:NSRegularExpressionCaseInsensitive
                                                                                             error:nil];
+        NSRegularExpression *chapterIndexFinder = [NSRegularExpression regularExpressionWithPattern:@"([0-9]+?)(</a> :)" options:NSRegularExpressionCaseInsensitive error:nil];
         tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
-        int chapterIndex = 0;
+        float chapterCount = 0.0;
         for(NSString *item in tableArray){
             NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
             chapterRange.location+=1;
@@ -96,6 +99,10 @@
             NSString *chapterURLString = [item substringWithRange:chapterURLRange];
             NSURL *chapterURL = [[NSURL alloc]initWithString:[@"http://www.mangareader.net" stringByAppendingString:chapterURLString]];
             
+            NSRange chapterIndexRange = [chapterIndexFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterIndexRange.length-=6;
+            NSNumber *chapterIndex = [NSNumber numberWithFloat:[[item substringWithRange:chapterIndexRange]floatValue]];
+            
             if([chapterTitle isEqualToString:@""]){
                 NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"(\">)(.*?)(</a>)"
                                                                                                 options:NSRegularExpressionCaseInsensitive
@@ -107,17 +114,20 @@
             }
             
             Chapter *newChapter = (Chapter*)[NSEntityDescription insertNewObjectForEntityForName:@"Chapter" inManagedObjectContext:context];
+            if([chapterTitle isEqualToString:@""]){
+                chapterTitle = @"N/A";
+            }
             newChapter.title = chapterTitle;
             newChapter.status = [NSNumber numberWithBool:NO];
             newChapter.manga = self;
             newChapter.chapterURL = [chapterURL absoluteString];
-            newChapter.index = [NSNumber numberWithInt: chapterIndex];
+            newChapter.index = chapterIndex;//[NSNumber numberWithFloat:chapterIndex];
             [chapterArray addObject:newChapter];
-            chapterIndex++;
+            chapterCount++;
             
         }
         self.chapters = [[NSSet alloc]initWithArray:chapterArray];
-        self.chapterTotal = [NSNumber numberWithInt:chapterIndex];
+        self.chapterTotal = [NSNumber numberWithInt:chapterCount];
         self.unreadChapters = self.chapterTotal;
     }
     
@@ -184,7 +194,88 @@
 
 }
 
--(void)updateChapters{
+-(void)updateChapters:context{
     //use the addChaptersObject and addChapters methods?
+    //set up indices using +.0001 if it already exists, then iterate and recode indices
+    NSString *html = [NSString stringWithContentsOfURL:[[NSURL alloc]initWithString:self.mangaURL] encoding:NSUTF8StringEncoding error:nil];
+
+    if ([self.host isEqualTo:@"MangaReader.net"]){
+        NSString *tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
+        NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:tableSearchString
+                                                                                    options:NSRegularExpressionDotMatchesLineSeparators
+                                                                                      error:nil];
+        NSRange tableRange = [tableRegex rangeOfFirstMatchInString:html options:NSMatchingReportProgress range:NSMakeRange(0, html.length)];
+        tableRange.location+=20;
+        tableRange.length-=7;
+        NSArray *tableArray = [[html substringWithRange:tableRange] componentsSeparatedByString:@"<tr>"];
+        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"(:)(.*?)(</td>)"
+                                                                                       options:NSRegularExpressionCaseInsensitive
+                                                                                         error:nil];
+        NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
+                                                                                          options:NSRegularExpressionCaseInsensitive
+                                                                                            error:nil];
+        
+        tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
+        float chapterIndex = 0.0;
+
+        for(NSString *item in tableArray){
+            NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterRange.location+=2;
+            chapterRange.length-=7;
+            NSString *chapterTitle = [item substringWithRange:chapterRange];
+            
+            NSRange chapterURLRange = [chapterURLFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterURLRange.location+=9;
+            chapterURLRange.length-=11;
+            NSString *chapterURLString = [item substringWithRange:chapterURLRange];
+            NSURL *chapterURL = [[NSURL alloc]initWithString:[@"http://www.mangareader.net" stringByAppendingString:chapterURLString]];
+            
+            if([chapterTitle isEqualToString:@""]){
+                NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"(\">)(.*?)(</a>)"
+                                                                                                options:NSRegularExpressionCaseInsensitive
+                                                                                                  error:nil];
+                chapterRange = [chapterFinder2 rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+                chapterRange.location+=3;
+                chapterRange.length-=7;
+                chapterTitle = [item substringWithRange:chapterRange];
+            }
+//            NSLog(@"%@",chapterTitle);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"chapterURL == %@",chapterURL];
+            NSSet* chapterCheck = [self.chapters filteredSetUsingPredicate:predicate];
+            NSUInteger setCount = [chapterCheck count];
+            if (setCount>1){
+                NSLog(@"Error, multiple chapters with the same index");
+            }
+            if(setCount == 0){
+                Chapter *newChapter = (Chapter*)[NSEntityDescription insertNewObjectForEntityForName:@"Chapter" inManagedObjectContext:context];
+                newChapter.title = chapterTitle;
+                newChapter.status = [NSNumber numberWithBool:NO];
+                newChapter.manga = self;
+                newChapter.chapterURL = [chapterURL absoluteString];
+                newChapter.index = [NSNumber numberWithInt: chapterIndex];
+                [self addChaptersObject:newChapter];
+                chapterIndex+=1;
+            }else{
+                
+                Chapter* prevChapter = [chapterCheck anyObject];
+                if (prevChapter.chapterURL==[chapterURL absoluteString]){
+                    chapterIndex+=1;
+                    continue;
+                }
+                chapterIndex+=.0001;
+                Chapter *newChapter = (Chapter*)[NSEntityDescription insertNewObjectForEntityForName:@"Chapter" inManagedObjectContext:context];
+                newChapter.title = chapterTitle;
+                newChapter.status = [NSNumber numberWithBool:NO];
+                newChapter.manga = self;
+                newChapter.chapterURL = [chapterURL absoluteString];
+                newChapter.index = [NSNumber numberWithInt: chapterIndex];
+                [self addChaptersObject:newChapter];
+            }
+            //use this when checking on updated chapters in the middle of lists
+//            NSLog(@"%f chapterIndex, %li setCount",chapterIndex,setCount);
+            
+        }
+    }
 }
+
 @end

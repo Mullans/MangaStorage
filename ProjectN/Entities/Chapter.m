@@ -21,12 +21,11 @@
 -(void)switchRead{
     if([self.status  isEqual: @(YES)]){
         self.status = @(NO);
-        self.manga.unreadChapters = @([self.manga.unreadChapters integerValue]-1);
+        self.manga.unreadChapters = @([self.manga.unreadChapters integerValue]+1);
     }else{
         self.status = @(YES);
-        self.manga.unreadChapters = @([self.manga.unreadChapters integerValue]+1);
+        self.manga.unreadChapters = @([self.manga.unreadChapters integerValue]-1);
     }
-    
 }
 -(NSURL *)getChapterURL{
     return [[NSURL alloc]initWithString:self.chapterURL];

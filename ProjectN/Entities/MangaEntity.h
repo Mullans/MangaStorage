@@ -35,6 +35,6 @@
 
 
 -(void)generateData:(NSURL*)mangaURL context:(NSManagedObjectContext*)context;
--(void)updateChapters;
+-(void)updateChapters:(NSManagedObjectContext*)context;
 
 @end

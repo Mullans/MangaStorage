@@ -31,7 +31,6 @@
     columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
     possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
     
-    //TODO add code to initialize data
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
     [fetchRequest setEntity:entity];
@@ -71,13 +70,27 @@
 }
 
 #pragma mark - Menu Item Methods
+- (IBAction)undoItemSelect:(id)sender {
+    [self.managedObjectContext undo];
+    [self reloadTable];
+}
+
+- (IBAction)redoItemSelect:(id)sender {
+    [self.managedObjectContext redo];
+    [self reloadTable];
+}
+
 - (IBAction)deleteItem:(id)sender {
     NSIndexSet *indexSet = [_tableView selectedRowIndexes];
+    NSMutableArray *toRemove = [[NSMutableArray alloc]initWithCapacity:10];
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
         //use index
         [_managedObjectContext deleteObject:[mangaList objectAtIndex:index]];
-        [mangaList removeObjectAtIndex:index];
+        [toRemove addObject:[mangaList objectAtIndex:index]];
     }];
+    for(NSObject *item in toRemove){
+        [mangaList removeObject:item];
+    }
     [_tableView reloadData];
 }
 
@@ -92,7 +105,7 @@
 
 - (IBAction)updateAllItemSelect:(id)sender {
     for(MangaEntity *item in mangaList){
-        [item updateChapters];
+        [item updateChapters:_managedObjectContext];
     }
 }
 
@@ -157,6 +170,20 @@
 
 #pragma mark - Table Methods
 
+-(void)reloadTable{
+    //only use this when coredata is changed without also changing mangaList
+    //ie. undo and redo
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    if (mangaList == nil) {
+        NSLog(@"Problem! %@",error);
+    }
+    [_tableView reloadData];
+}
+
 //clicked on columnheader
 -(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
     NSLog(@"Sort based on header TBD");
@@ -168,7 +195,7 @@
 
 -(void)rowDoubleClicked{
     @try{
-        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self];
+        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self context:_managedObjectContext];
     }@catch(NSException *e){
         NSLog(@"Didn't click on row");
     }

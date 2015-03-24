@@ -19,15 +19,28 @@
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
-- (IBAction)getUpdates:(id)sender {
-    [myManga updateChapters];
+- (IBAction)unreadExcluder:(id)sender {
+    if([sender state] == NSOnState){
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"status == %@",@(NO)];
+        chapters = [[myManga.chapters allObjects] filteredArrayUsingPredicate:predicate];
+    }else{
+        chapters = [myManga.chapters allObjects];
+    }
+    chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
     [_tableView reloadData];
 }
 
--(id)initWithManga:(MangaEntity*)newManga parent:(id)parent{
+- (IBAction)getUpdates:(id)sender {
+    [myManga updateChapters:context];
+    [_tableView reloadData];
+}
+
+-(id)initWithManga:(MangaEntity*)newManga parent:(id)parent context:(NSManagedObjectContext*)newContext{
     self = [super initWithWindowNibName:@"MangaWindow"];
     [self.window makeKeyAndOrderFront:self];
     [self.window makeMainWindow];
+    
+    context = newContext;
     
     _tableView.dataSource = self;
     _tableView.delegate = self;
@@ -64,8 +77,10 @@
     NSSortDescriptor *sortDescriptor;
     sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"index"
                                                  ascending:YES];
-    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    sortDescriptors = [NSMutableArray arrayWithObject:sortDescriptor];
     chapters = [[newManga.chapters allObjects] sortedArrayUsingDescriptors:sortDescriptors];
+    
+    sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0]];
     
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
     
@@ -77,16 +92,22 @@
 -(void)rowDoubleClicked{
     
     NSUInteger flags = [NSEvent modifierFlags];// & NSDeviceIndependentModifierFlagsMask;
+//    NSUInteger *temp = [_tableView clickedRow];
+    if([_tableView clickedRow] == -1){
+        return;
+    }
     if( flags == NSShiftKeyMask ){
         NSURL* chapterURL = [[chapters objectAtIndex:[_tableView clickedRow]] getChapterURL];
         [[NSWorkspace sharedWorkspace] openURL: chapterURL];
     } else {
         [[chapters objectAtIndex:[_tableView clickedRow]]switchRead];
         Chapter* item = [chapters objectAtIndex:[_tableView clickedRow]];
-        NSLog(@"%@",item.status);
         [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[myManga.unreadChapters integerValue]]]];
         [_numToRead sizeToFit];
+        chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
         [_tableView reloadData];
+        NSLog(@"\nTitle:%@\nIndex:%@",item.title,item.index);
+
     }
 }
 
@@ -108,10 +129,11 @@
     [cellTF setDrawsBackground:NO];
     [result addSubview:cellTF];
     Chapter *chapter = [chapters objectAtIndex:row];
-    if ([tableColumn.identifier isEqual:@"Title"]){
+    if([tableColumn.identifier isEqual:@"Index"]){
+        result.textField.stringValue = [NSString stringWithFormat:@"%@",chapter.index];
+    }else if ([tableColumn.identifier isEqual:@"Title"]){
         result.textField.stringValue = chapter.title;
-    }else{
-        NSLog(@"%@",chapter.status);
+    }else if([tableColumn.identifier isEqual:@"Status"]){
         if ([chapter.status isEqual:@(NO)]){
             result.textField.stringValue = @"Unread";
         }else{
@@ -121,4 +143,65 @@
     return result;
 }
 
+-(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
+
+    if([tableColumn.identifier isEqual:@"Index"]){
+        if([sorters[0] isEqual:@(0)]){
+            sorters[0] = @(2);
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"index" ascending:YES];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        }else if([sorters[0] isEqual:@(2)]){
+            sorters[0] = @(1);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'index'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"index" ascending:NO];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            
+        }else if([sorters[0] isEqual:@(1)]){
+            sorters[0] = @(0);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'index'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            
+        }
+    }else if ([tableColumn.identifier isEqual:@"Title"]){
+        if([sorters[1] isEqual:@(0)]){
+            sorters[1] = @(2);
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"title" ascending:YES];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        }else if([sorters[1] isEqual:@(2)]){
+            sorters[1] = @(1);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'title'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"title" ascending:NO];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            
+        }else if([sorters[0] isEqual:@(1)]){
+            sorters[1] = @(0);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'title'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            
+        }
+    }else if([tableColumn.identifier isEqual:@"Status"]){
+        if([sorters[2] isEqual:@(0)]){
+            sorters[2] = @(2);
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"status" ascending:YES];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            
+            
+        }else if([sorters[2] isEqual:@(2)]){
+            sorters[2] = @(1);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'status'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"status" ascending:NO];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        }else if([sorters[2] isEqual:@(1)]){
+            sorters[2] = @(0);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'status'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+        }
+    }
+    
+    chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
+    [_tableView reloadData];
+}
 @end

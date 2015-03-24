@@ -37,6 +37,8 @@
 @property (weak) IBOutlet NSScrollView *scrollView;
 @property (weak) IBOutlet NSTableView *tableView;
 
+- (IBAction)undoItemSelect:(id)sender;
+- (IBAction)redoItemSelect:(id)sender;
 
 - (IBAction)deleteItem:(id)sender;
 
@@ -46,5 +48,6 @@
 - (IBAction)viewItemSelect:(id)sender;
 -(void)rowDoubleClicked;
 -(void)updateTableColumns;
+-(void)reloadTable;
 @end
 

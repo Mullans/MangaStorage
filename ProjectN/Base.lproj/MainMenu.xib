@@ -134,12 +134,12 @@
                         <items>
                             <menuItem title="Undo" keyEquivalent="z" id="dRJ-4n-Yzg">
                                 <connections>
-                                    <action selector="undo:" target="-1" id="M6e-cu-g7V"/>
+                                    <action selector="undoItemSelect:" target="Voe-Tx-rLC" id="Ewr-Qe-dCf"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Redo" keyEquivalent="Z" id="6dh-zS-Vam">
                                 <connections>
-                                    <action selector="redo:" target="-1" id="oIA-Rs-6OD"/>
+                                    <action selector="redoItemSelect:" target="Voe-Tx-rLC" id="xtF-C1-kr9"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="WRV-NI-Exz"/>
@@ -793,7 +793,7 @@ CA
                                                 </tableCellView>
                                             </prototypeCellViews>
                                         </tableColumn>
-                                        <tableColumn identifier="Number of Chapters" width="123.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="T6f-3n-Dpu">
+                                        <tableColumn identifier="Number of Chapters" width="124.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="T6f-3n-Dpu">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Number of Chapters">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
