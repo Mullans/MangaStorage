@@ -38,12 +38,13 @@
 @property (weak) IBOutlet NSTableView *tableView;
 
 
+- (IBAction)deleteItem:(id)sender;
+
 - (IBAction)updateItemSelect:(id)sender;
 - (IBAction)updateAllItemSelect:(id)sender;
 - (IBAction)newMenuItemSelect:(id)sender;
 - (IBAction)viewItemSelect:(id)sender;
 -(void)rowDoubleClicked;
 -(void)updateTableColumns;
--(void)failAlert;
 @end
 

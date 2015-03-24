@@ -17,32 +17,68 @@
 @implementation AppDelegate
 
 
+
+
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    // Insert code here to initialize your application
+    mangaList = [[NSMutableArray alloc]initWithCapacity:10];
+    
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    [_tableView setDoubleAction:@selector(rowDoubleClicked)];
+    widths = @[@6,@4,@4,@4,@3,@4,@3];
+    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
+    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
+    
+    //TODO add code to initialize data
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    if (mangaList == nil) {
+        NSLog(@"Problem! %@",error);
+    }
+    
+    
+    
+    [self updateTableColumns];
+}
+
+-(void)windowWillClose:(NSNotification *)notification{
+    NSLog(@"Window closed");
+    [_tableView reloadData];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
+}
+
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
+    return YES;
+}
+
+#pragma mark - Adding Window Methods
 - (IBAction)addButton:(id)sender {
-    addWindow = [[AddingWindow alloc]init];
+    addWindow = [[AddingWindow alloc]initWithContext:_managedObjectContext];
     addWindow.delegate = self;
 }
 
--(void)addingWindow:(AddingWindow *)addingWindow addedManga:(Manga *)manga{
-    if([titles containsObject:[manga getTitle]]){
-        [self failAlert];
-        return;
-    }
-    [titles addObject:[manga getTitle]];
+-(void)addingWindow:(AddingWindow *)addingWindow addedManga:(MangaEntity *)manga{
     [mangaList addObject:manga];
     [_tableView reloadData];
 }
 
--(void)closingWindow{
-    
-}
-
--(void)failAlert{
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"Continue"];
-    [alert setMessageText:@"New Manga Already Exists"];
-    [alert setInformativeText:@"The manga you tried to add is already in your library."];
-    [alert setAlertStyle:NSCriticalAlertStyle];
-    [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+#pragma mark - Menu Item Methods
+- (IBAction)deleteItem:(id)sender {
+    NSIndexSet *indexSet = [_tableView selectedRowIndexes];
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+        //use index
+        [_managedObjectContext deleteObject:[mangaList objectAtIndex:index]];
+        [mangaList removeObjectAtIndex:index];
+    }];
+    [_tableView reloadData];
 }
 
 - (IBAction)updateItemSelect:(id)sender {
@@ -50,13 +86,12 @@
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
         //use index
         [[mangaList objectAtIndex:index]updateChapters];
-        NSLog(@"%lu",index);
     }];
     
 }
 
 - (IBAction)updateAllItemSelect:(id)sender {
-    for(Manga *item in mangaList){
+    for(MangaEntity *item in mangaList){
         [item updateChapters];
     }
 }
@@ -117,6 +152,31 @@
     [self updateTableColumns];
 }
 
+
+
+
+#pragma mark - Table Methods
+
+//clicked on columnheader
+-(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
+    NSLog(@"Sort based on header TBD");
+}
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
+    return mangaList.count;
+}
+
+-(void)rowDoubleClicked{
+    @try{
+        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self];
+    }@catch(NSException *e){
+        NSLog(@"Didn't click on row");
+    }
+    
+    
+    //mangaWindow.delegate = self;
+}
+
 -(void)updateTableColumns{
     //makes sure the appropriate columns are present
     int total = 0;
@@ -153,56 +213,6 @@
     
 }
 
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    mangaList = [[NSMutableArray alloc]initWithCapacity:10];
-//    Manga *item = [[Manga alloc]init];
-//    [mangaList addObject:item];
-    _tableView.dataSource = self;
-    _tableView.delegate = self;
-    [_tableView setDoubleAction:@selector(rowDoubleClicked)];
-    widths = @[@6,@4,@4,@4,@3,@4,@3];
-    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
-    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
-    
-    //add code to initialize titles
-    titles = [[NSMutableArray alloc]initWithCapacity:10];
-    
-    
-    [self updateTableColumns];
-}
-
--(void)rowDoubleClicked{
-    @try{
-        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self];
-    }@catch(NSException *e){
-        NSLog(@"Didn't click on row");
-    }
-
-        
-    //mangaWindow.delegate = self;
-}
-
--(void)windowWillClose:(NSNotification *)notification{
-    NSLog(@"Window closed");
-    [_tableView reloadData];
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-}
-
-//clicked on columnheader
--(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
-    NSLog(@"Sort based on header TBD");
-}
-
--(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-    return mangaList.count;
-}
-
-
 //if images, height 50, else text height (change in actual table?)
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
     NSTableCellView *result = [tableView makeViewWithIdentifier:@"tableView" owner:self];
@@ -216,35 +226,29 @@
     [cellTF setBordered:NO];
     [cellTF setEditable:NO];
     [cellTF setDrawsBackground:NO];
-    Manga* manga = [mangaList objectAtIndex:row];
-    int columnIndex = [possibleOptions indexOfObject:tableColumn.identifier];
+    MangaEntity* manga = [mangaList objectAtIndex:row];
+    NSUInteger columnIndex = [possibleOptions indexOfObject:tableColumn.identifier];
     if (columnIndex==0){
-        result.textField.stringValue = [manga getTitle];
+        result.textField.stringValue = manga.title;
     }else if(columnIndex==1){
-        result.textField.stringValue = [manga getAuthor];
+        result.textField.stringValue = manga.author;
     }else if(columnIndex==2){
-        result.textField.stringValue = [manga getArtist];
+        result.textField.stringValue = manga.artist;
     }else if(columnIndex==3){
-        result.textField.stringValue = [manga getHost];
+        result.textField.stringValue = manga.host;
     }else if(columnIndex==4){
-        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumChapters]];
+        result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.chapterTotal integerValue]];
     }else if (columnIndex==5){
-        if([manga getStatus]==true){
+        if([manga.status isEqual:@(YES)]){
             result.textField.stringValue = @"Completed";
         }else{
             result.textField.stringValue = @"Ongoing";
         }
     }else if(columnIndex==6){
-        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumberToRead]];
+        result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.unreadChapters integerValue]];
     }
     return result;
 }
-
--(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
-    return YES;
-}
-
-
 
 #pragma mark - Core Data stack
 

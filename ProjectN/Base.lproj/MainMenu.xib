@@ -165,9 +165,11 @@
                                 </connections>
                             </menuItem>
                             <menuItem title="Delete" id="pa3-QI-u2k">
-                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                                 <connections>
-                                    <action selector="delete:" target="-1" id="0Mk-Ml-PaM"/>
+                                    <action selector="deleteItem:" target="Voe-Tx-rLC" id="Tm5-iR-r7d"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Select All" keyEquivalent="a" id="Ruw-6m-B2m">
@@ -791,7 +793,7 @@
                                                 </tableCellView>
                                             </prototypeCellViews>
                                         </tableColumn>
-                                        <tableColumn identifier="Number of Chapters" width="124.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="T6f-3n-Dpu">
+                                        <tableColumn identifier="Number of Chapters" width="123.5" minWidth="10" maxWidth="3.4028234663852886e+38" id="T6f-3n-Dpu">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Number of Chapters">
                                                 <font key="font" metaFont="smallSystem"/>
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>

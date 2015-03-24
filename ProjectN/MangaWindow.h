@@ -8,11 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Manga.h"
+#import "MangaEntity.h"
+#import "Chapter.h"
 
 @protocol MangaWindowDelegate;
 
 @interface MangaWindow : NSWindowController <NSTableViewDataSource, NSTableViewDelegate>{
-    Manga* myManga;
+    MangaEntity* myManga;
+    NSArray* chapters;
 }
 @property (weak) IBOutlet NSTextField *author;
 @property (weak) IBOutlet NSTextField *artist;
@@ -25,7 +28,7 @@
 @property (weak) IBOutlet NSTextField *numToRead;
 
 - (IBAction)getUpdates:(id)sender;
--(id)initWithManga:(Manga*)newManga parent:(id)parent;
+-(id)initWithManga:(MangaEntity*)newManga parent:(id)parent;
 -(void)rowDoubleClicked;
 @end
 

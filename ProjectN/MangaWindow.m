@@ -24,7 +24,7 @@
     [_tableView reloadData];
 }
 
--(id)initWithManga:(Manga*)newManga parent:(id)parent{
+-(id)initWithManga:(MangaEntity*)newManga parent:(id)parent{
     self = [super initWithWindowNibName:@"MangaWindow"];
     [self.window makeKeyAndOrderFront:self];
     [self.window makeMainWindow];
@@ -34,20 +34,20 @@
     self.window.delegate = parent;
     myManga = newManga;
     
-    [self.window setTitle:[newManga getTitle]];
+    [self.window setTitle:newManga.title];
     
-    [_coverImage setImage:[newManga getCover]];
+    [_coverImage setImage:[[NSImage alloc]initWithData:newManga.coverArt]];
     
-    [_author setStringValue:[@"Author: " stringByAppendingString:[newManga getAuthor]]];
+    [_author setStringValue:[@"Author: " stringByAppendingString:newManga.author]];
     [_author sizeToFit];
     
-    [_artist setStringValue:[@"Artist: " stringByAppendingString:[newManga getArtist]]];
+    [_artist setStringValue:[@"Artist: " stringByAppendingString:newManga.artist]];
     [_artist sizeToFit];
     
-    [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%i",(int)[newManga getNumberToRead]]]];
+    [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[newManga.unreadChapters integerValue]]]];
     [_numToRead sizeToFit];
     
-    if ([newManga getAuthor]){
+    if (newManga.status == [NSNumber numberWithBool:NO]){
         [_status setStringValue:@"Status: Ongoing"];
         [_status sizeToFit];
     }else{
@@ -55,11 +55,17 @@
         [_status sizeToFit];
     }
     
-    [_host setStringValue:[@"Host: " stringByAppendingString:[newManga getHost]]];
+    [_host setStringValue:[@"Host: " stringByAppendingString:newManga.host]];
     [_host sizeToFit];
     
-    [_numChapters setStringValue:[@"Number Of Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%i",(int)[newManga getNumChapters]]]];
+    [_numChapters setStringValue:[@"Number Of Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[newManga.chapterTotal integerValue]]]];
     [_numChapters sizeToFit];
+    
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"index"
+                                                 ascending:YES];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+    chapters = [[newManga.chapters allObjects] sortedArrayUsingDescriptors:sortDescriptors];
     
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
     
@@ -70,22 +76,22 @@
 
 -(void)rowDoubleClicked{
     
-    
-    
     NSUInteger flags = [NSEvent modifierFlags];// & NSDeviceIndependentModifierFlagsMask;
     if( flags == NSShiftKeyMask ){
-        NSURL* chapterURL = [myManga getChapterURL:[_tableView clickedRow]];
+        NSURL* chapterURL = [[chapters objectAtIndex:[_tableView clickedRow]] getChapterURL];
         [[NSWorkspace sharedWorkspace] openURL: chapterURL];
     } else {
-        [myManga switchRead:[_tableView clickedRow]];
-        [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%i",(int)[myManga getNumberToRead]]]];
+        [[chapters objectAtIndex:[_tableView clickedRow]]switchRead];
+        Chapter* item = [chapters objectAtIndex:[_tableView clickedRow]];
+        NSLog(@"%@",item.status);
+        [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[myManga.unreadChapters integerValue]]]];
         [_numToRead sizeToFit];
         [_tableView reloadData];
     }
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-    return [myManga getNumChapters];
+    return [chapters count];
 }
 
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
@@ -101,15 +107,12 @@
     [cellTF setEditable:NO];
     [cellTF setDrawsBackground:NO];
     [result addSubview:cellTF];
-    result.textField = cellTF;
-    [cellTF setBordered:NO];
-    [cellTF setEditable:NO];
-    [cellTF setDrawsBackground:NO];
-    NSArray *chapter = [myManga getChapter:row];
+    Chapter *chapter = [chapters objectAtIndex:row];
     if ([tableColumn.identifier isEqual:@"Title"]){
-        result.textField.stringValue = chapter[0];
+        result.textField.stringValue = chapter.title;
     }else{
-        if ([chapter[1] integerValue]==0){
+        NSLog(@"%@",chapter.status);
+        if ([chapter.status isEqual:@(NO)]){
             result.textField.stringValue = @"Unread";
         }else{
             result.textField.stringValue = @"Read";
