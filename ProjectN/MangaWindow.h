@@ -31,7 +31,10 @@
 @property (weak) IBOutlet NSImageView *coverImage;
 @property (weak) IBOutlet NSButton *markButton;
 @property (weak) IBOutlet NSTextField *numToRead;
+@property (weak) IBOutlet NSTextField *rating;
+@property (weak) IBOutlet NSStepper *stepperValue;
 - (IBAction)unreadExcluder:(id)sender;
+- (IBAction)stepperClicked:(id)sender;
 
 - (IBAction)getUpdates:(id)sender;
 - (IBAction)markButtonPressed:(id)sender;

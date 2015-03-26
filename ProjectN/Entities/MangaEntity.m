@@ -44,7 +44,7 @@
     int addToCompletedRange;
     int subFromCompletedLength;
     NSString *updatedCheck;
-    
+    self.rating = 0;
     NSString *tableSearchString;
     
     NSString *html = [NSString stringWithContentsOfURL:mangaURL encoding:NSUTF8StringEncoding error:nil];

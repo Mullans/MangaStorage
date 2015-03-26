@@ -33,6 +33,12 @@
     [_tableView reloadData];
 }
 
+- (IBAction)stepperClicked:(id)sender {
+    myManga.rating = @(_stepperValue.integerValue);
+    [_rating setStringValue:[NSString stringWithFormat:@"Rating: %li/10",(long)[myManga.rating integerValue]]];
+
+}
+
 - (IBAction)getUpdates:(id)sender {
     [myManga updateChapters:context];
     
@@ -84,6 +90,8 @@
     
     [_coverImage setImage:[[NSImage alloc]initWithData:newManga.coverArt]];
     
+    [_rating setStringValue:[NSString stringWithFormat:@"Rating: %li/10",(long)[newManga.rating integerValue]]];
+
     [_author setStringValue:[@"Author: " stringByAppendingString:newManga.author]];
     [_author sizeToFit];
     
