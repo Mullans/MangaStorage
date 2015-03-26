@@ -19,6 +19,7 @@
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
 }
+
 - (IBAction)unreadExcluder:(id)sender {
     if([sender state] == NSOnState){
         filtered = YES;
@@ -46,10 +47,31 @@
     [_tableView reloadData];
 }
 
+- (IBAction)markButtonPressed:(id)sender {
+    if([_markButton.title isEqual:@"Mark Selected Read"]){
+        NSIndexSet *indexSet = [_tableView selectedRowIndexes];
+        NSMutableArray *toRemove = [[NSMutableArray alloc]initWithCapacity:10];
+        [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+            //use index
+            [[chapters objectAtIndex:index]switchRead];
+        }];
+        _markButton.title = @"Mark All Read";
+    }else{
+        for(Chapter* item in chapters){
+            [item switchRead];
+        }
+    }
+    [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[myManga.unreadChapters integerValue]]]];
+    [_numToRead sizeToFit];
+    chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
+    [_tableView reloadData];
+}
+
 -(id)initWithManga:(MangaEntity*)newManga parent:(id)parent context:(NSManagedObjectContext*)newContext{
     self = [super initWithWindowNibName:@"MangaWindow"];
     [self.window makeKeyAndOrderFront:self];
     [self.window makeMainWindow];
+    self.window.delegate = self;
     
     context = newContext;
     
@@ -93,7 +115,7 @@
     
     [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:[_tableView tableColumnWithIdentifier:@"Index"]];
     
-    sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0]];
+    sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0,@0]];
     
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
     
@@ -109,19 +131,37 @@
     if([_tableView clickedRow] == -1){
         return;
     }
+    /*
+     Code for clicking on only a specific column
+    if([_tableView clickedColumn]==[_tableView columnWithIdentifier:@"Status"]){
+        
+    }
+     */
     if( flags == NSShiftKeyMask ){
         NSURL* chapterURL = [[chapters objectAtIndex:[_tableView clickedRow]] getChapterURL];
         [[NSWorkspace sharedWorkspace] openURL: chapterURL];
     } else {
         [[chapters objectAtIndex:[_tableView clickedRow]]switchRead];
-        Chapter* item = [chapters objectAtIndex:[_tableView clickedRow]];
+        [chapters objectAtIndex:[_tableView clickedRow]];
         [_numToRead setStringValue:[@"Unread Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[myManga.unreadChapters integerValue]]]];
         [_numToRead sizeToFit];
         chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
         [_tableView reloadData];
 
     }
+    if([[_tableView selectedRowIndexes]count] == 0){
+        _markButton.title = @"Mark All Read";
+    }
 }
+
+-(void)tableViewSelectionDidChange:(NSNotification *)notification{
+    if([[_tableView selectedRowIndexes]count] > 0){
+        _markButton.title = @"Mark Selected Read";
+    }else{
+        _markButton.title = @"Mark All Read";
+    }
+}
+
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
     return [chapters count];
@@ -151,11 +191,15 @@
         }else{
             result.textField.stringValue = @"Read";
         }
+    }else if([tableColumn.identifier isEqual:@"Date"]){
+        NSDateFormatter *dateFormater = [[NSDateFormatter alloc] init];
+        [dateFormater setDateFormat:@"MM/dd/yyyy"];
+        result.textField.stringValue = [dateFormater stringFromDate:chapter.addDate];
     }
     return result;
 }
 
--(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
+-(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn{
     [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
     if([tableColumn.identifier isEqual:@"Index"]){
         if([sorters[0] isEqual:@(0)]){
@@ -219,6 +263,27 @@
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'status'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
             [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
+        }
+    }else if ([tableColumn.identifier isEqual:@"Date"]){
+        if([sorters[3] isEqual:@(0)]){
+            sorters[3] = @(2);
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"addDate" ascending:YES];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
+        }else if([sorters[3] isEqual:@(2)]){
+            sorters[3] = @(1);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'addDate'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"addDate" ascending:NO];
+            [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
+            
+        }else if([sorters[3] isEqual:@(1)]){
+            sorters[3] = @(0);
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'addDate'"];
+            [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
+            
         }
     }
     chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];

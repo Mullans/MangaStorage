@@ -29,10 +29,12 @@
 @property (weak) IBOutlet NSScrollView *scrollView;
 @property (weak) IBOutlet NSTableView *tableView;
 @property (weak) IBOutlet NSImageView *coverImage;
+@property (weak) IBOutlet NSButton *markButton;
 @property (weak) IBOutlet NSTextField *numToRead;
 - (IBAction)unreadExcluder:(id)sender;
 
 - (IBAction)getUpdates:(id)sender;
+- (IBAction)markButtonPressed:(id)sender;
 -(id)initWithManga:(MangaEntity*)newManga parent:(id)parent context:(NSManagedObjectContext*)newContext;
 -(void)rowDoubleClicked;
 @end
