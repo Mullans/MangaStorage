@@ -10,6 +10,7 @@
 #import <CoreData/CoreData.h>
 #import <Cocoa/Cocoa.h>
 #import "Chapter.h"
+#import "Genre.h"
 
 
 @interface MangaEntity : NSManagedObject
@@ -21,9 +22,13 @@
 @property (nonatomic, retain) NSNumber * chapterTotal;
 @property (nonatomic, retain) NSData * coverArt;
 @property (nonatomic, retain) NSNumber * status;
+@property (nonatomic, retain) NSNumber * missingChapters;
 @property (nonatomic, retain) NSString * mangaURL;
 @property (nonatomic, retain) NSNumber * unreadChapters;
+@property (nonatomic, retain) NSNumber * rating;
 @property (nonatomic, retain) NSSet *chapters;
+@property (nonatomic, retain) NSSet *genres;
+
 @end
 
 @interface MangaEntity (CoreDataGeneratedAccessors)

@@ -16,6 +16,7 @@
 		3D0CAD1F1AA63056007DAE8D /* AddingWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */; };
 		3D0CAD201AA63056007DAE8D /* AddingWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */; };
 		3D0CAD221AA631F5007DAE8D /* qmsmall.png in Resources */ = {isa = PBXBuildFile; fileRef = 3D0CAD211AA631F5007DAE8D /* qmsmall.png */; };
+		3D14B7761AC2753400511F43 /* Genre.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D14B7751AC2753400511F43 /* Genre.m */; };
 		3D2EDAF31AC12BDE009FAF50 /* MangaEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D2EDAF21AC12BDE009FAF50 /* MangaEntity.m */; };
 		3D2EDAF61AC12BDE009FAF50 /* Chapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D2EDAF51AC12BDE009FAF50 /* Chapter.m */; };
 		3DEB3D131ABBE6B3000A51CE /* MangaWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DEB3D111ABBE6B3000A51CE /* MangaWindow.m */; };
@@ -49,6 +50,8 @@
 		3D0CAD1D1AA63056007DAE8D /* AddingWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddingWindow.m; sourceTree = "<group>"; };
 		3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddingWindow.xib; sourceTree = "<group>"; };
 		3D0CAD211AA631F5007DAE8D /* qmsmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = qmsmall.png; path = ../../qmsmall.png; sourceTree = "<group>"; };
+		3D14B7741AC2753400511F43 /* Genre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Genre.h; sourceTree = "<group>"; };
+		3D14B7751AC2753400511F43 /* Genre.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Genre.m; sourceTree = "<group>"; };
 		3D2EDAF11AC12BDE009FAF50 /* MangaEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MangaEntity.h; path = Entities/MangaEntity.h; sourceTree = "<group>"; };
 		3D2EDAF21AC12BDE009FAF50 /* MangaEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MangaEntity.m; path = Entities/MangaEntity.m; sourceTree = "<group>"; };
 		3D2EDAF41AC12BDE009FAF50 /* Chapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Chapter.h; path = Entities/Chapter.h; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 				3D0CAD1E1AA63056007DAE8D /* AddingWindow.xib */,
 				3D0CAD211AA631F5007DAE8D /* qmsmall.png */,
 				3D0CAD001AA627A3007DAE8D /* ProjectN.xcdatamodeld */,
+				3D14B7741AC2753400511F43 /* Genre.h */,
+				3D14B7751AC2753400511F43 /* Genre.m */,
 				3D2EDAF41AC12BDE009FAF50 /* Chapter.h */,
 				3D2EDAF51AC12BDE009FAF50 /* Chapter.m */,
 				3D2EDAF11AC12BDE009FAF50 /* MangaEntity.h */,
@@ -255,6 +260,7 @@
 				3DEB3D131ABBE6B3000A51CE /* MangaWindow.m in Sources */,
 				3DFBA51D1AAC050200F7EDFD /* Manga.m in Sources */,
 				3D0CAD1F1AA63056007DAE8D /* AddingWindow.m in Sources */,
+				3D14B7761AC2753400511F43 /* Genre.m in Sources */,
 				3D2EDAF61AC12BDE009FAF50 /* Chapter.m in Sources */,
 				3D0CAD021AA627A3007DAE8D /* ProjectN.xcdatamodeld in Sources */,
 				3D0CACFF1AA627A3007DAE8D /* main.m in Sources */,

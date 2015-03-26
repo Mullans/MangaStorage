@@ -41,6 +41,6 @@
 
 @protocol AddingWindowDelegate <NSObject>
 
--(void)addingWindow:(AddingWindow*)addingWindow addedManga:(Manga*)manga;
+-(void)addingWindow:(AddingWindow*)addingWindow addedManga:(MangaEntity*)manga;
 
 @end

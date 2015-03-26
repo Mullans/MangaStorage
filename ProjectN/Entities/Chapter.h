@@ -18,6 +18,7 @@
 @property (nonatomic, retain) NSString * chapterURL;
 @property (nonatomic, retain) MangaEntity *manga;
 @property (nonatomic, retain) NSNumber * status;
+@property (nonatomic, retain) NSDate * addDate;
 
 -(void)switchRead;
 -(NSURL*)getChapterURL;

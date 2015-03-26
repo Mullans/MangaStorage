@@ -17,6 +17,7 @@
 @dynamic chapterURL;
 @dynamic manga;
 @dynamic status;
+@dynamic addDate;
 
 -(void)switchRead{
     if([self.status  isEqual: @(YES)]){

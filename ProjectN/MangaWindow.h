@@ -19,6 +19,7 @@
     NSManagedObjectContext* context;
     NSMutableArray *sorters;
     NSMutableArray *sortDescriptors;
+    bool filtered;
 }
 @property (weak) IBOutlet NSTextField *author;
 @property (weak) IBOutlet NSTextField *artist;

@@ -21,6 +21,9 @@
 @dynamic mangaURL;
 @dynamic unreadChapters;
 @dynamic chapters;
+@dynamic genres;
+@dynamic rating;
+@dynamic missingChapters;
 
 -(void)generateData:(NSURL *)mangaURL context:(NSManagedObjectContext *)context{
     self.mangaURL = [mangaURL absoluteString];
@@ -67,6 +70,20 @@
         updatedCheck = @"Ongoing";
         
         
+        NSString *genreSearchString = @"(<span class=\"genretags\">)(.+?)(</span>)";
+        NSRegularExpression *genreRegex = [NSRegularExpression regularExpressionWithPattern:genreSearchString options:NSRegularExpressionCaseInsensitive error:nil];
+        NSArray* genreMatches = [genreRegex matchesInString:html options:0 range:NSMakeRange(0, html.length)];
+        NSMutableArray *genres = [[NSMutableArray alloc]initWithCapacity:10];
+        for (NSTextCheckingResult* match in genreMatches){
+            NSRange genreRange = match.range;
+            genreRange.location+=24;
+            genreRange.length-=31;
+            Genre *newGenre = (Genre*)[NSEntityDescription insertNewObjectForEntityForName:@"Genre" inManagedObjectContext:context];
+            NSLog(@"%@",[html substringWithRange:genreRange]);
+            newGenre.title = [html substringWithRange:genreRange];
+            [genres addObject:newGenre];
+        }
+        
         
         
         tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
@@ -78,19 +95,26 @@
         tableRange.length-=7;
         NSArray *tableArray = [[html substringWithRange:tableRange] componentsSeparatedByString:@"<tr>"];
         NSMutableArray *chapterArray = [[NSMutableArray alloc]initWithCapacity:10];
-        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"(:)(.*?)(</td>)"
+        //regex for title
+        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"( : )(.*?)(</td>)"
                                                                                        options:NSRegularExpressionCaseInsensitive
                                                                                          error:nil];
+        //regex for url
         NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
                                                                                           options:NSRegularExpressionCaseInsensitive
                                                                                             error:nil];
+        //regex for date
+        NSRegularExpression *chapterDateFinder = [NSRegularExpression regularExpressionWithPattern:@"[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]" options:NSRegularExpressionDotMatchesLineSeparators error:nil];
+        
+        //regex for index (mangareader only)
         NSRegularExpression *chapterIndexFinder = [NSRegularExpression regularExpressionWithPattern:@"([0-9]+?)(</a> :)" options:NSRegularExpressionCaseInsensitive error:nil];
+        
         tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
         float chapterCount = 0.0;
         for(NSString *item in tableArray){
             NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
-            chapterRange.location+=1;
-            chapterRange.length-=6;
+            chapterRange.location+=3;
+            chapterRange.length-=8;
             NSString *chapterTitle = [item substringWithRange:chapterRange];
             
             NSRange chapterURLRange = [chapterURLFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
@@ -103,13 +127,18 @@
             chapterIndexRange.length-=6;
             NSNumber *chapterIndex = [NSNumber numberWithFloat:[[item substringWithRange:chapterIndexRange]floatValue]];
             
+            NSRange dateRange = [chapterDateFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            NSDateFormatter *dateFormater = [[NSDateFormatter alloc] init];
+            [dateFormater setDateFormat:@"MM/dd/yyyy"];
+            NSDate *chapterDate = [dateFormater dateFromString:[item substringWithRange:dateRange]];
+            
             if([chapterTitle isEqualToString:@""]){
                 NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"(\">)(.*?)(</a>)"
                                                                                                 options:NSRegularExpressionCaseInsensitive
                                                                                                   error:nil];
                 chapterRange = [chapterFinder2 rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
-                chapterRange.location+=3;
-                chapterRange.length-=7;
+                chapterRange.location+=2;
+                chapterRange.length-=6;
                 chapterTitle = [item substringWithRange:chapterRange];
             }
             
@@ -122,6 +151,7 @@
             newChapter.manga = self;
             newChapter.chapterURL = [chapterURL absoluteString];
             newChapter.index = chapterIndex;//[NSNumber numberWithFloat:chapterIndex];
+            newChapter.addDate = chapterDate;
             [chapterArray addObject:newChapter];
             chapterCount++;
             
@@ -200,28 +230,35 @@
     NSString *html = [NSString stringWithContentsOfURL:[[NSURL alloc]initWithString:self.mangaURL] encoding:NSUTF8StringEncoding error:nil];
 
     if ([self.host isEqualTo:@"MangaReader.net"]){
-        NSString *tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
-        NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:tableSearchString
+        //regex for chapter table
+        NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:@"(<table id=\"listing\">)(.*?)(</table>)"
                                                                                     options:NSRegularExpressionDotMatchesLineSeparators
                                                                                       error:nil];
         NSRange tableRange = [tableRegex rangeOfFirstMatchInString:html options:NSMatchingReportProgress range:NSMakeRange(0, html.length)];
         tableRange.location+=20;
         tableRange.length-=7;
         NSArray *tableArray = [[html substringWithRange:tableRange] componentsSeparatedByString:@"<tr>"];
-        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"(:)(.*?)(</td>)"
+        NSMutableArray *chapterArray = [[NSMutableArray alloc]initWithCapacity:10];
+        //regex for title
+        NSRegularExpression *chapterFinder = [NSRegularExpression regularExpressionWithPattern:@"( : )(.*?)(</td>)"
                                                                                        options:NSRegularExpressionCaseInsensitive
                                                                                          error:nil];
+        //regex for url
         NSRegularExpression *chapterURLFinder = [NSRegularExpression regularExpressionWithPattern:@"(<a href=\")(.*?)(\">)"
                                                                                           options:NSRegularExpressionCaseInsensitive
                                                                                             error:nil];
+        //regex for date
+        NSRegularExpression *chapterDateFinder = [NSRegularExpression regularExpressionWithPattern:@"[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]" options:NSRegularExpressionDotMatchesLineSeparators error:nil];
+        
+        //regex for index (mangareader only)
+        NSRegularExpression *chapterIndexFinder = [NSRegularExpression regularExpressionWithPattern:@"([0-9]+?)(</a> :)" options:NSRegularExpressionCaseInsensitive error:nil];
         
         tableArray = [tableArray subarrayWithRange:NSMakeRange(1,tableArray.count-1)];
-        float chapterIndex = 0.0;
-
+        float chapterCount = 0.0;
         for(NSString *item in tableArray){
             NSRange chapterRange = [chapterFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
-            chapterRange.location+=2;
-            chapterRange.length-=7;
+            chapterRange.location+=3;
+            chapterRange.length-=8;
             NSString *chapterTitle = [item substringWithRange:chapterRange];
             
             NSRange chapterURLRange = [chapterURLFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
@@ -230,21 +267,31 @@
             NSString *chapterURLString = [item substringWithRange:chapterURLRange];
             NSURL *chapterURL = [[NSURL alloc]initWithString:[@"http://www.mangareader.net" stringByAppendingString:chapterURLString]];
             
+            NSRange chapterIndexRange = [chapterIndexFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            chapterIndexRange.length-=6;
+            NSNumber *chapterIndex = [NSNumber numberWithFloat:[[item substringWithRange:chapterIndexRange]floatValue]];
+            
+            NSRange dateRange = [chapterDateFinder rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
+            NSDateFormatter *dateFormater = [[NSDateFormatter alloc] init];
+            [dateFormater setDateFormat:@"MM/dd/yyyy"];
+            NSDate *chapterDate = [dateFormater dateFromString:[item substringWithRange:dateRange]];
+            
             if([chapterTitle isEqualToString:@""]){
                 NSRegularExpression *chapterFinder2 = [NSRegularExpression regularExpressionWithPattern:@"(\">)(.*?)(</a>)"
                                                                                                 options:NSRegularExpressionCaseInsensitive
                                                                                                   error:nil];
                 chapterRange = [chapterFinder2 rangeOfFirstMatchInString:item options:NSMatchingReportProgress range:NSMakeRange(0,item.length)];
-                chapterRange.location+=3;
-                chapterRange.length-=7;
+                chapterRange.location+=2;
+                chapterRange.length-=6;
                 chapterTitle = [item substringWithRange:chapterRange];
             }
+
 //            NSLog(@"%@",chapterTitle);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"chapterURL == %@",chapterURL];
             NSSet* chapterCheck = [self.chapters filteredSetUsingPredicate:predicate];
             NSUInteger setCount = [chapterCheck count];
             if (setCount>1){
-                NSLog(@"Error, multiple chapters with the same index");
+                NSLog(@"Error, multiple chapters with the same URL");
             }
             if(setCount == 0){
                 Chapter *newChapter = (Chapter*)[NSEntityDescription insertNewObjectForEntityForName:@"Chapter" inManagedObjectContext:context];
@@ -252,24 +299,22 @@
                 newChapter.status = [NSNumber numberWithBool:NO];
                 newChapter.manga = self;
                 newChapter.chapterURL = [chapterURL absoluteString];
-                newChapter.index = [NSNumber numberWithInt: chapterIndex];
+                newChapter.index = chapterIndex;
+                newChapter.addDate = chapterDate;
                 [self addChaptersObject:newChapter];
-                chapterIndex+=1;
+                chapterCount+=1;
             }else{
-                
-                Chapter* prevChapter = [chapterCheck anyObject];
-                if (prevChapter.chapterURL==[chapterURL absoluteString]){
-                    chapterIndex+=1;
-                    continue;
-                }
-                chapterIndex+=.0001;
+                //chapter already exists
+                // remove all but the continue when done testing
                 Chapter *newChapter = (Chapter*)[NSEntityDescription insertNewObjectForEntityForName:@"Chapter" inManagedObjectContext:context];
-                newChapter.title = chapterTitle;
+                newChapter.title = @"temp";
                 newChapter.status = [NSNumber numberWithBool:NO];
                 newChapter.manga = self;
                 newChapter.chapterURL = [chapterURL absoluteString];
-                newChapter.index = [NSNumber numberWithInt: chapterIndex];
+                newChapter.index = chapterIndex;
+                newChapter.addDate = chapterDate;
                 [self addChaptersObject:newChapter];
+                continue;
             }
             //use this when checking on updated chapters in the middle of lists
 //            NSLog(@"%f chapterIndex, %li setCount",chapterIndex,setCount);

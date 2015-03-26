@@ -21,9 +21,11 @@
 }
 - (IBAction)unreadExcluder:(id)sender {
     if([sender state] == NSOnState){
+        filtered = YES;
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"status == %@",@(NO)];
         chapters = [[myManga.chapters allObjects] filteredArrayUsingPredicate:predicate];
     }else{
+        filtered = NO;
         chapters = [myManga.chapters allObjects];
     }
     chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
@@ -32,6 +34,15 @@
 
 - (IBAction)getUpdates:(id)sender {
     [myManga updateChapters:context];
+    
+    if(filtered){
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"status == %@",@(NO)];
+        chapters = [[myManga.chapters allObjects] filteredArrayUsingPredicate:predicate];
+    }else{
+        chapters = [myManga.chapters allObjects];
+    }
+    chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
+
     [_tableView reloadData];
 }
 
@@ -80,6 +91,8 @@
     sortDescriptors = [NSMutableArray arrayWithObject:sortDescriptor];
     chapters = [[newManga.chapters allObjects] sortedArrayUsingDescriptors:sortDescriptors];
     
+    [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:[_tableView tableColumnWithIdentifier:@"Index"]];
+    
     sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0]];
     
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
@@ -106,7 +119,6 @@
         [_numToRead sizeToFit];
         chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
         [_tableView reloadData];
-        NSLog(@"\nTitle:%@\nIndex:%@",item.title,item.index);
 
     }
 }
@@ -144,41 +156,46 @@
 }
 
 -(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
-
+    [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
     if([tableColumn.identifier isEqual:@"Index"]){
         if([sorters[0] isEqual:@(0)]){
             sorters[0] = @(2);
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"index" ascending:YES];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
         }else if([sorters[0] isEqual:@(2)]){
             sorters[0] = @(1);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'index'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"index" ascending:NO];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
             
         }else if([sorters[0] isEqual:@(1)]){
             sorters[0] = @(0);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'index'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
-            
+            [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
         }
     }else if ([tableColumn.identifier isEqual:@"Title"]){
         if([sorters[1] isEqual:@(0)]){
             sorters[1] = @(2);
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"title" ascending:YES];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
         }else if([sorters[1] isEqual:@(2)]){
             sorters[1] = @(1);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'title'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"title" ascending:NO];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
             
-        }else if([sorters[0] isEqual:@(1)]){
+        }else if([sorters[1] isEqual:@(1)]){
             sorters[1] = @(0);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'title'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
             
         }
     }else if([tableColumn.identifier isEqual:@"Status"]){
@@ -186,6 +203,7 @@
             sorters[2] = @(2);
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"status" ascending:YES];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
             
             
         }else if([sorters[2] isEqual:@(2)]){
@@ -194,13 +212,15 @@
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:@"status" ascending:NO];
             [sortDescriptors insertObject:sortDescriptor atIndex:0];
+            [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
+
         }else if([sorters[2] isEqual:@(1)]){
             sorters[2] = @(0);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == 'status'"];
             [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+            [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
         }
     }
-    
     chapters = [chapters sortedArrayUsingDescriptors:sortDescriptors];
     [_tableView reloadData];
 }
