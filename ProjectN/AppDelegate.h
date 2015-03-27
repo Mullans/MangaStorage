@@ -30,6 +30,7 @@
 @property (weak) IBOutlet NSMenuItem *numberMenu;
 @property (weak) IBOutlet NSMenuItem *statusMenu;
 @property (weak) IBOutlet NSMenuItem *updatesMenu;
+@property (weak) IBOutlet NSMenuItem *ratingsMenu;
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;

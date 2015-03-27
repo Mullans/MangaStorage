@@ -89,6 +89,9 @@
         }else if (sender==_updatesMenu){
             [columnOptions replaceObjectAtIndex:6 withObject:@1];
             _updatesMenu.title = @"Hide New Updates";
+        }else if (sender==_ratingsMenu){
+            [columnOptions replaceObjectAtIndex:7 withObject:@1];
+            _updatesMenu.title = @"Hide Ratings";
         }
     }else{
         if (sender==_titleMenu){
@@ -112,6 +115,9 @@
         }else if (sender==_updatesMenu){
             [columnOptions replaceObjectAtIndex:6 withObject:@0];
             _updatesMenu.title = @"Show New Updates";
+        }else if (sender==_ratingsMenu){
+            [columnOptions replaceObjectAtIndex:7 withObject:@0];
+             _updatesMenu.title = @"Show Ratings";
         }
     }
     [self updateTableColumns];
@@ -162,9 +168,9 @@
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
-    widths = @[@6,@4,@4,@4,@3,@4,@3];
-    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
-    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
+    widths = @[@6,@4,@4,@4,@3,@4,@3,@3];
+    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0,@0]];
+    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates",@"Ratings"];
     
     //add code to initialize titles
     titles = [[NSMutableArray alloc]initWithCapacity:10];

@@ -17,6 +17,7 @@
                 <outlet property="authorMenu" destination="HQZ-pr-AgI" id="t3u-e0-pPg"/>
                 <outlet property="hostingMenu" destination="cgS-LY-cFC" id="Ve3-kx-c7M"/>
                 <outlet property="numberMenu" destination="sZR-LZ-Pbo" id="jRF-LW-PMf"/>
+                <outlet property="ratingsMenu" destination="zdw-th-afp" id="eQ1-Y3-RbV"/>
                 <outlet property="scrollView" destination="12J-Bq-RrF" id="PWn-Jj-Azc"/>
                 <outlet property="statusMenu" destination="oyE-W3-Jgb" id="sPp-SB-LFN"/>
                 <outlet property="tableView" destination="65h-DL-smn" id="tG3-dp-1G2"/>
@@ -653,6 +654,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="viewItemSelect:" target="Voe-Tx-rLC" id="bhV-Qw-l3k"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show Rating" id="zdw-th-afp">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="viewItemSelect:" target="Voe-Tx-rLC" id="X9q-9z-GXH"/>
                                 </connections>
                             </menuItem>
                         </items>
