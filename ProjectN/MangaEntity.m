@@ -2,28 +2,32 @@
 //  MangaEntity.m
 //  MangaStorage
 //
-//  Created by Sean Mullan on 3/24/15.
+//  Created by Sean Mullan on 3/27/15.
 //  Copyright (c) 2015 SilentLupin. All rights reserved.
 //
 
 #import "MangaEntity.h"
+#import "Chapter.h"
+#import "Genre.h"
 
 
 @implementation MangaEntity
 
-@dynamic author;
-@dynamic title;
 @dynamic artist;
-@dynamic host;
+@dynamic author;
 @dynamic chapterTotal;
 @dynamic coverArt;
-@dynamic status;
+@dynamic host;
 @dynamic mangaURL;
+@dynamic missingChapters;
+@dynamic rating;
+@dynamic status;
+@dynamic title;
 @dynamic unreadChapters;
 @dynamic chapters;
 @dynamic genres;
-@dynamic rating;
-@dynamic missingChapters;
+
+
 
 -(void)generateData:(NSURL *)mangaURL context:(NSManagedObjectContext *)context{
     self.mangaURL = [mangaURL absoluteString];
@@ -82,8 +86,8 @@
             NSLog(@"%@",[html substringWithRange:genreRange]);
             newGenre.title = [html substringWithRange:genreRange];
             [genres addObject:newGenre];
+            [self addGenresObject:newGenre];
         }
-        
         
         
         tableSearchString = @"(<table id=\"listing\">)(.*?)(</table>)";
@@ -221,14 +225,14 @@
     }else{
         self.status = [NSNumber numberWithBool:YES];
     }
-
+    
 }
 
 -(void)updateChapters:context{
     //use the addChaptersObject and addChapters methods?
     //set up indices using +.0001 if it already exists, then iterate and recode indices
     NSString *html = [NSString stringWithContentsOfURL:[[NSURL alloc]initWithString:self.mangaURL] encoding:NSUTF8StringEncoding error:nil];
-
+    
     if ([self.host isEqualTo:@"MangaReader.net"]){
         //regex for chapter table
         NSRegularExpression *tableRegex = [NSRegularExpression regularExpressionWithPattern:@"(<table id=\"listing\">)(.*?)(</table>)"
@@ -285,8 +289,8 @@
                 chapterRange.length-=6;
                 chapterTitle = [item substringWithRange:chapterRange];
             }
-
-//            NSLog(@"%@",chapterTitle);
+            
+            //            NSLog(@"%@",chapterTitle);
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"chapterURL == %@",chapterURL];
             NSSet* chapterCheck = [self.chapters filteredSetUsingPredicate:predicate];
             NSUInteger setCount = [chapterCheck count];
@@ -317,7 +321,7 @@
                 continue;
             }
             //use this when checking on updated chapters in the middle of lists
-//            NSLog(@"%f chapterIndex, %li setCount",chapterIndex,setCount);
+            //            NSLog(@"%f chapterIndex, %li setCount",chapterIndex,setCount);
             
         }
     }

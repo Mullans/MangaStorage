@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AddingWindow.h"
-#import "Manga.h"
 #import "MangaWindow.h"
+#import "MangaEntity.h"
+#import "PreferenceEntity.h"
+#import "Genre.h"
 
 //TODO: make shown categories customizable
 //TODO: IMPORTANT implement coredata
@@ -22,6 +24,12 @@
     NSArray *possibleOptions;
     NSArray *widths;
     NSMutableArray *titles;
+    
+    NSMutableArray *sorters;
+    NSMutableArray *sortDescriptors;
+    NSArray *predicateKeys;
+    
+    PreferenceEntity *preference;
 }
 @property (weak) IBOutlet NSMenuItem *titleMenu;
 @property (weak) IBOutlet NSMenuItem *authorMenu;
@@ -36,9 +44,12 @@
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (weak) IBOutlet NSScrollView *scrollView;
 @property (weak) IBOutlet NSTableView *tableView;
+@property (weak) IBOutlet NSMenuItem *genreSortItem;
 
 - (IBAction)undoItemSelect:(id)sender;
 - (IBAction)redoItemSelect:(id)sender;
+- (IBAction)genreSortItemSelect:(id)sender;
+- (IBAction)genreSortEditItemSelect:(id)sender;
 
 - (IBAction)deleteItem:(id)sender;
 

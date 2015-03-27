@@ -27,26 +27,51 @@
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
-    widths = @[@6,@4,@4,@4,@3,@4,@3];
-    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0]];
-    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates"];
+    widths = @[@6,@4,@4,@4,@3,@4,@3,@3];
+    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0,@0]];
+    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates",@"Rating"];
+    predicateKeys = @[@"title",@"author",@"artist",@"host",@"chapterTotal",@"status",@"unreadChapters",@"rating"];
+    
+    //set initial sorting
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title"
+                                                 ascending:YES];
+    sortDescriptors = [NSMutableArray arrayWithObject:sortDescriptor];
+//    mangaList = [mangaList sortedArrayUsingDescriptors:sortDescriptors];
+    
+    NSFetchRequest *preferencesRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *preferenceDescriptor = [NSEntityDescription entityForName:@"PreferenceEntity" inManagedObjectContext:[self managedObjectContext]];
+    [preferencesRequest setEntity:preferenceDescriptor];
+    NSError *prefError = nil;
+    NSArray *fetchedPreference =[[self managedObjectContext] executeFetchRequest:preferencesRequest error:&prefError];
+    if([fetchedPreference count]==0){
+        //genereate
+        preference = (PreferenceEntity*)[NSEntityDescription insertNewObjectForEntityForName:@"PreferenceEntity" inManagedObjectContext:[self managedObjectContext]];
+    }else if([fetchedPreference count]==1){
+        preference = [fetchedPreference objectAtIndex:0];
+    }else{
+        NSLog(@"TOO MANY PREFERENCE OBJECTS");
+    }
+    
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
     [fetchRequest setEntity:entity];
     NSError *error = nil;
+    [fetchRequest setSortDescriptors:sortDescriptors];
     mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
     if (mangaList == nil) {
         NSLog(@"Problem! %@",error);
     }
-    
-    
+    sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0,@0,@0,@0,@0,@0]];
+
+    [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:[_tableView tableColumnWithIdentifier:@"Title"]];
     
     [self updateTableColumns];
 }
 
 -(void)windowWillClose:(NSNotification *)notification{
-    NSLog(@"Window closed");
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
     [_tableView reloadData];
 }
 
@@ -66,6 +91,18 @@
 
 -(void)addingWindow:(AddingWindow *)addingWindow addedManga:(MangaEntity *)manga{
     [mangaList addObject:manga];
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
+    NSMutableArray *genreStrings = [[NSMutableArray alloc]initWithCapacity:10];
+    for(Genre* genre in preference.totalGenres){
+        [genreStrings addObject:genre.title];
+    }
+    for(Genre* genre in manga.genres){
+        if([genreStrings containsObject:genre.title]){
+            continue;
+        }
+        [preference addTotalGenresObject:genre];
+    }
+
     [_tableView reloadData];
 }
 
@@ -78,6 +115,12 @@
 - (IBAction)redoItemSelect:(id)sender {
     [self.managedObjectContext redo];
     [self reloadTable];
+}
+
+- (IBAction)genreSortItemSelect:(id)sender {
+}
+
+- (IBAction)genreSortEditItemSelect:(id)sender {
 }
 
 - (IBAction)deleteItem:(id)sender {
@@ -181,12 +224,36 @@
     if (mangaList == nil) {
         NSLog(@"Problem! %@",error);
     }
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
     [_tableView reloadData];
 }
 
 //clicked on columnheader
--(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
-    NSLog(@"Sort based on header TBD");
+-(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn{
+    NSUInteger index = [possibleOptions indexOfObject:tableColumn.identifier];
+    
+    if([sorters[index] isEqual:@(0)]){
+        sorters[index] = @(2);
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:predicateKeys[index] ascending:YES];
+        [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
+    }else if([sorters[index] isEqual:@(2)]){
+        sorters[index] = @(1);
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@",predicateKeys[index]];
+        [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:predicateKeys[index] ascending:NO];
+        [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
+        
+    }else if([sorters[index] isEqual:@(1)]){
+        sorters[index] = @(0);
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@",predicateKeys[index]];
+        [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+        [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
+    }
+    
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
+    [_tableView reloadData];
 }
 
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
@@ -194,6 +261,9 @@
 }
 
 -(void)rowDoubleClicked{
+    if([_tableView clickedRow] == -1){
+        return;
+    }
     @try{
         mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self context:_managedObjectContext];
     }@catch(NSException *e){

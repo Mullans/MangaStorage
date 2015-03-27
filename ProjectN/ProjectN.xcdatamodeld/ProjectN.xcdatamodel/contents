@@ -26,9 +26,15 @@
         <relationship name="chapters" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Chapter" inverseName="manga" inverseEntity="Chapter" syncable="YES"/>
         <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" syncable="YES"/>
     </entity>
+    <entity name="PreferenceEntity" representedClassName="PreferenceEntity" syncable="YES">
+        <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="totalCount" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="totalGenres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" syncable="YES"/>
+    </entity>
     <elements>
         <element name="Chapter" positionX="261" positionY="-0" width="128" height="135"/>
         <element name="Genre" positionX="99" positionY="63" width="128" height="58"/>
         <element name="MangaEntity" positionX="-63" positionY="-18" width="128" height="240"/>
+        <element name="PreferenceEntity" positionX="99" positionY="90" width="128" height="90"/>
     </elements>
 </model>

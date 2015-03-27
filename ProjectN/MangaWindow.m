@@ -208,7 +208,6 @@
 }
 
 -(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn{
-    [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
     if([tableColumn.identifier isEqual:@"Index"]){
         if([sorters[0] isEqual:@(0)]){
             sorters[0] = @(2);
