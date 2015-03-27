@@ -118,9 +118,11 @@
 }
 
 - (IBAction)genreSortItemSelect:(id)sender {
+    NSLog(@"Genre Sorting");
 }
 
 - (IBAction)genreSortEditItemSelect:(id)sender {
+    NSLog(@"Genre Sort Pref");
 }
 
 - (IBAction)deleteItem:(id)sender {
