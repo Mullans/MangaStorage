@@ -29,6 +29,8 @@
     NSMutableArray *sortDescriptors;
     NSArray *predicateKeys;
     
+    bool updatesOnly;
+    
     PreferenceEntity *preference;
 }
 @property (weak) IBOutlet NSMenuItem *titleMenu;
@@ -51,6 +53,7 @@
 - (IBAction)redoItemSelect:(id)sender;
 - (IBAction)genreSortItemSelect:(id)sender;
 - (IBAction)genreSortEditItemSelect:(id)sender;
+- (IBAction)showOnlyUpdates:(id)sender;
 
 - (IBAction)deleteItem:(id)sender;
 

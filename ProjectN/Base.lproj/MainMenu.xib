@@ -134,6 +134,22 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Edit" id="W48-6f-4Dl">
                         <items>
+                            <menuItem title="Cut" keyEquivalent="x" id="rtI-dA-Nfx">
+                                <connections>
+                                    <action selector="cut:" target="-1" id="lxm-mR-K81"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copy" keyEquivalent="c" id="joZ-XL-5WA">
+                                <connections>
+                                    <action selector="copy:" target="-1" id="Tkz-VI-Kno"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Paste" keyEquivalent="v" id="QZO-lo-uey">
+                                <connections>
+                                    <action selector="paste:" target="-1" id="YEn-cm-TzQ"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="d62-SN-iTg"/>
                             <menuItem title="Undo" keyEquivalent="z" id="dRJ-4n-Yzg">
                                 <connections>
                                     <action selector="undoItemSelect:" target="Voe-Tx-rLC" id="Ewr-Qe-dCf"/>
@@ -402,6 +418,16 @@ CA
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
+                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nCm-Hq-3Te">
+                        <rect key="frame" x="440" y="764" width="145" height="18"/>
+                        <buttonCell key="cell" type="check" title="Only Show Updates" bezelStyle="regularSquare" imagePosition="left" inset="2" id="efj-Iu-ByK">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <connections>
+                                <action selector="showOnlyUpdates:" target="Voe-Tx-rLC" id="nVJ-DI-KXR"/>
+                            </connections>
+                        </buttonCell>
+                    </button>
                 </subviews>
             </view>
             <point key="canvasLocation" x="428" y="426"/>

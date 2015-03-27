@@ -83,7 +83,6 @@
             genreRange.location+=24;
             genreRange.length-=31;
             Genre *newGenre = (Genre*)[NSEntityDescription insertNewObjectForEntityForName:@"Genre" inManagedObjectContext:context];
-            NSLog(@"%@",[html substringWithRange:genreRange]);
             newGenre.title = [html substringWithRange:genreRange];
             [genres addObject:newGenre];
             [self addGenresObject:newGenre];

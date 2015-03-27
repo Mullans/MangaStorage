@@ -24,6 +24,8 @@
     // Insert code here to initialize your application
     mangaList = [[NSMutableArray alloc]initWithCapacity:10];
     
+    updatesOnly = NO;
+    
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
@@ -124,6 +126,7 @@
 - (IBAction)genreSortEditItemSelect:(id)sender {
     NSLog(@"Genre Sort Pref");
 }
+
 
 - (IBAction)deleteItem:(id)sender {
     NSIndexSet *indexSet = [_tableView selectedRowIndexes];
@@ -236,6 +239,28 @@
     [_tableView reloadData];
 }
 
+
+- (IBAction)showOnlyUpdates:(id)sender {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    [fetchRequest setSortDescriptors:sortDescriptors];
+    
+    if([sender state] == NSOnState){
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"unreadChapters > 0"];
+        [fetchRequest setPredicate:predicate];
+    }
+    
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    if (mangaList == nil) {
+        NSLog(@"Problem! %@",error);
+    }
+    [_tableView reloadData];
+
+}
+
+
 //clicked on columnheader
 -(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn{
     NSUInteger index = [possibleOptions indexOfObject:tableColumn.identifier];
@@ -319,54 +344,10 @@
 }
 
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    mangaList = [[NSMutableArray alloc]initWithCapacity:10];
-//    Manga *item = [[Manga alloc]init];
-//    [mangaList addObject:item];
-    _tableView.dataSource = self;
-    _tableView.delegate = self;
-    [_tableView setDoubleAction:@selector(rowDoubleClicked)];
-    widths = @[@6,@4,@4,@4,@3,@4,@3,@3];
-    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0,@0]];
-    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates",@"Ratings"];
-    
-    //add code to initialize titles
-    titles = [[NSMutableArray alloc]initWithCapacity:10];
-    
-    
-    [self updateTableColumns];
-}
-
--(void)rowDoubleClicked{
-    @try{
-        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self];
-    }@catch(NSException *e){
-        NSLog(@"Didn't click on row");
-    }
-
-        
-    //mangaWindow.delegate = self;
-}
-
--(void)windowWillClose:(NSNotification *)notification{
-    NSLog(@"Window closed");
-    [_tableView reloadData];
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
-}
-
 //clicked on columnheader
 -(void)tableView:(NSTableView *)tableView mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn{
     NSLog(@"Sort based on header TBD");
 }
-
--(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-    return mangaList.count;
-}
-
 
 //if images, height 50, else text height (change in actual table?)
 -(NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
@@ -401,6 +382,8 @@
         }
     }else if(columnIndex==6){
         result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.unreadChapters integerValue]];
+    }else if(columnIndex==7){
+        result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.rating integerValue]];
     }
     return result;
 }

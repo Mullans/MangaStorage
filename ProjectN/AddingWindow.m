@@ -15,16 +15,42 @@
 @implementation AddingWindow
 
 
+- (IBAction)attributeEdited:(id)sender {
+    if(sender==_title){
+        myManga.title = _title.stringValue;
+    }else if(sender==_author){
+        myManga.author = _author.stringValue;
+    }else if(sender==_artist){
+        myManga.artist = _artist.stringValue;
+    }else if(sender==_numChapters){
+        if([_numChapters integerValue]<1){
+            _numChapters.stringValue = myManga.chapterTotal;
+            return;
+        }
+        myManga.chapterTotal = @([_numChapters integerValue]);
+    }else if(sender==_hostingSite){
+        myManga.host = _hostingSite.stringValue;
+    }
+    [sender sizeToFit];
+}
+
 -(id)initWithContext:(NSManagedObjectContext*)context{
     self = [super initWithWindowNibName:@"AddingWindow"];
     [self.window makeKeyAndOrderFront:self];
     [self.window makeMainWindow];
     [self.window setTitle:@"Add New Manga"];
+    self.window.delegate = self;
     _context = context;
+    toSave = false;
     return self;
 }
 
-
+-(BOOL)windowShouldClose:(id)sender{
+    if(!toSave){
+        [_context deleteObject:myManga];
+    }
+    return true;
+}
 
 - (void)windowDidLoad {
     [super windowDidLoad];
@@ -43,7 +69,6 @@
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"mangaURL == %@",[search absoluteString]];
         [fetchRequest setPredicate:predicate];
         NSUInteger count = [_context countForFetchRequest:fetchRequest error:nil];
-        NSLog(@"%lu",(unsigned long)count);
         if (count==NSNotFound || count==0){
             [myManga generateData:search context:_context];
         }else{
@@ -53,29 +78,29 @@
             return;
         }
         
-        [_title setStringValue:[@"Title: " stringByAppendingString:myManga.title]];
+        [_title setStringValue:myManga.title];
         [_title sizeToFit];
         
         [_mangaImage setImage:[[NSImage alloc]initWithData:myManga.coverArt]];
         
-        [_author setStringValue:[@"Author: " stringByAppendingString:myManga.author]];
+        [_author setStringValue:myManga.author];
         [_author sizeToFit];
         
-        [_artist setStringValue:[@"Artist: " stringByAppendingString:myManga.artist]];
+        [_artist setStringValue:myManga.artist];
         [_artist sizeToFit];
         
         if (myManga.status){
-            [_status setStringValue:@"Status: Ongoing"];
+            [_status setStringValue:@"Ongoing"];
             [_status sizeToFit];
         }else{
-            [_status setStringValue:@"Status: Completed"];
+            [_status setStringValue:@"Completed"];
             [_status sizeToFit];
         }
         
-        [_hostingSite setStringValue:[@"Host: " stringByAppendingString:myManga.host]];
+        [_hostingSite setStringValue:myManga.host];
         [_hostingSite sizeToFit];
         
-        [_numChapters setStringValue:[@"Number Of Chapters: " stringByAppendingString:[NSString stringWithFormat:@"%li",[myManga.chapterTotal integerValue]]]];
+        [_numChapters setStringValue:[NSString stringWithFormat:@"%li",[myManga.chapterTotal integerValue]]];
         [_numChapters sizeToFit];
         
         [_addButton setEnabled:YES];
@@ -105,7 +130,19 @@
     if([strongDelegate respondsToSelector:@selector(addingWindow:addedManga:)]){
         [strongDelegate addingWindow:self addedManga:myManga];
     }
-    
+    toSave = true;
     [self.window close];
+}
+
+
+- (IBAction)statusChange:(id)sender {
+    if ([_status.title isEqual:@"Ongoing"]){
+        _status.title = @"Completed";
+        myManga.status = [NSNumber numberWithBool:YES];
+    }else{
+        _status.title = @"Ongoing";
+        myManga.status = [NSNumber numberWithBool:NO];
+    }
+    [_status sizeToFit];
 }
 @end
