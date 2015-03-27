@@ -12,7 +12,6 @@
                 <outlet property="hostingSite" destination="P1u-Cg-vFA" id="icF-F3-BpO"/>
                 <outlet property="inputText" destination="AFr-47-iFc" id="5P4-sU-uBZ"/>
                 <outlet property="mangaImage" destination="yRW-7f-r09" id="Sqa-k8-e0B"/>
-                <outlet property="newImage" destination="yRW-7f-r09" id="89T-34-Y2g"/>
                 <outlet property="numChapters" destination="XaX-GM-tzp" id="ugS-Ly-dRu"/>
                 <outlet property="status" destination="QmX-Pl-Xe2" id="SZE-LE-QaH"/>
                 <outlet property="title" destination="mfD-Mo-an2" id="SKP-2b-7vH"/>

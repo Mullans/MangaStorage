@@ -8,11 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Manga.h"
+#import "MangaEntity.h"
 
 @protocol AddingWindowDelegate;
 
 @interface AddingWindow : NSWindowController{
     Manga* newManga;
+    MangaEntity* myManga;
 }
 
 @property (weak) IBOutlet NSTextField *inputText;
@@ -24,17 +26,21 @@
 @property (weak) IBOutlet NSTextField *numChapters;
 @property (weak) IBOutlet NSTextField *hostingSite;
 @property (weak) IBOutlet NSButton *addButton;
+@property (weak) NSManagedObjectContext* context;
+
+
+-(id)initWithContext:(NSManagedObjectContext*)context;
 
 #pragma mark - Delegate Stuff
 
 @property (nonatomic, weak)id<AddingWindowDelegate> delegate;
--(void)failAlert;
+-(void)failAlert: (int)option;
 - (IBAction)saveButton:(id)sender;
 
 @end
 
 @protocol AddingWindowDelegate <NSObject>
 
--(void)addingWindow:(AddingWindow*)addingWindow addedManga:(Manga*)manga;
+-(void)addingWindow:(AddingWindow*)addingWindow addedManga:(MangaEntity*)manga;
 
 @end

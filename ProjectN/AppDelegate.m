@@ -17,32 +17,126 @@
 @implementation AppDelegate
 
 
-- (IBAction)addButton:(id)sender {
-    addWindow = [[AddingWindow alloc]init];
-    addWindow.delegate = self;
+
+
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    // Insert code here to initialize your application
+    mangaList = [[NSMutableArray alloc]initWithCapacity:10];
+    
+    _tableView.dataSource = self;
+    _tableView.delegate = self;
+    [_tableView setDoubleAction:@selector(rowDoubleClicked)];
+    widths = @[@6,@4,@4,@4,@3,@4,@3,@3];
+    columnOptions = [[NSMutableArray alloc]initWithArray:@[@1,@1,@1,@0,@0,@1,@0,@0]];
+    possibleOptions = @[@"Title",@"Author",@"Artist",@"Hosting Site",@"Number of Chapters",@"Status",@"Updates",@"Rating"];
+    predicateKeys = @[@"title",@"author",@"artist",@"host",@"chapterTotal",@"status",@"unreadChapters",@"rating"];
+    
+    //set initial sorting
+    NSSortDescriptor *sortDescriptor;
+    sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title"
+                                                 ascending:YES];
+    sortDescriptors = [NSMutableArray arrayWithObject:sortDescriptor];
+//    mangaList = [mangaList sortedArrayUsingDescriptors:sortDescriptors];
+    
+    NSFetchRequest *preferencesRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *preferenceDescriptor = [NSEntityDescription entityForName:@"PreferenceEntity" inManagedObjectContext:[self managedObjectContext]];
+    [preferencesRequest setEntity:preferenceDescriptor];
+    NSError *prefError = nil;
+    NSArray *fetchedPreference =[[self managedObjectContext] executeFetchRequest:preferencesRequest error:&prefError];
+    if([fetchedPreference count]==0){
+        //genereate
+        preference = (PreferenceEntity*)[NSEntityDescription insertNewObjectForEntityForName:@"PreferenceEntity" inManagedObjectContext:[self managedObjectContext]];
+    }else if([fetchedPreference count]==1){
+        preference = [fetchedPreference objectAtIndex:0];
+    }else{
+        NSLog(@"TOO MANY PREFERENCE OBJECTS");
+    }
+    
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    [fetchRequest setSortDescriptors:sortDescriptors];
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    if (mangaList == nil) {
+        NSLog(@"Problem! %@",error);
+    }
+    sorters = [[NSMutableArray alloc]initWithArray:@[@2,@0,@0,@0,@0,@0,@0,@0]];
+
+    [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:[_tableView tableColumnWithIdentifier:@"Title"]];
+    
+    [self updateTableColumns];
 }
 
--(void)addingWindow:(AddingWindow *)addingWindow addedManga:(Manga *)manga{
-    if([titles containsObject:[manga getTitle]]){
-        [self failAlert];
-        return;
-    }
-    [titles addObject:[manga getTitle]];
-    [mangaList addObject:manga];
+-(void)windowWillClose:(NSNotification *)notification{
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
     [_tableView reloadData];
 }
 
--(void)closingWindow{
-    
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
 }
 
--(void)failAlert{
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"Continue"];
-    [alert setMessageText:@"New Manga Already Exists"];
-    [alert setInformativeText:@"The manga you tried to add is already in your library."];
-    [alert setAlertStyle:NSCriticalAlertStyle];
-    [alert beginSheetModalForWindow:[self window] completionHandler:nil];
+-(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
+    return YES;
+}
+
+#pragma mark - Adding Window Methods
+- (IBAction)addButton:(id)sender {
+    addWindow = [[AddingWindow alloc]initWithContext:_managedObjectContext];
+    addWindow.delegate = self;
+}
+
+-(void)addingWindow:(AddingWindow *)addingWindow addedManga:(MangaEntity *)manga{
+    [mangaList addObject:manga];
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
+    NSMutableArray *genreStrings = [[NSMutableArray alloc]initWithCapacity:10];
+    for(Genre* genre in preference.totalGenres){
+        [genreStrings addObject:genre.title];
+    }
+    for(Genre* genre in manga.genres){
+        if([genreStrings containsObject:genre.title]){
+            continue;
+        }
+        [preference addTotalGenresObject:genre];
+    }
+
+    [_tableView reloadData];
+}
+
+#pragma mark - Menu Item Methods
+- (IBAction)undoItemSelect:(id)sender {
+    [self.managedObjectContext undo];
+    [self reloadTable];
+}
+
+- (IBAction)redoItemSelect:(id)sender {
+    [self.managedObjectContext redo];
+    [self reloadTable];
+}
+
+- (IBAction)genreSortItemSelect:(id)sender {
+    NSLog(@"Genre Sorting");
+}
+
+- (IBAction)genreSortEditItemSelect:(id)sender {
+    NSLog(@"Genre Sort Pref");
+}
+
+- (IBAction)deleteItem:(id)sender {
+    NSIndexSet *indexSet = [_tableView selectedRowIndexes];
+    NSMutableArray *toRemove = [[NSMutableArray alloc]initWithCapacity:10];
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
+        //use index
+        [_managedObjectContext deleteObject:[mangaList objectAtIndex:index]];
+        [toRemove addObject:[mangaList objectAtIndex:index]];
+    }];
+    for(NSObject *item in toRemove){
+        [mangaList removeObject:item];
+    }
+    [_tableView reloadData];
 }
 
 - (IBAction)updateItemSelect:(id)sender {
@@ -50,14 +144,13 @@
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
         //use index
         [[mangaList objectAtIndex:index]updateChapters];
-        NSLog(@"%lu",index);
     }];
     
 }
 
 - (IBAction)updateAllItemSelect:(id)sender {
-    for(Manga *item in mangaList){
-        [item updateChapters];
+    for(MangaEntity *item in mangaList){
+        [item updateChapters:_managedObjectContext];
     }
 }
 
@@ -121,6 +214,72 @@
         }
     }
     [self updateTableColumns];
+}
+
+
+
+
+#pragma mark - Table Methods
+
+-(void)reloadTable{
+    //only use this when coredata is changed without also changing mangaList
+    //ie. undo and redo
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    if (mangaList == nil) {
+        NSLog(@"Problem! %@",error);
+    }
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
+    [_tableView reloadData];
+}
+
+//clicked on columnheader
+-(void)tableView:(NSTableView *)tableView didClickTableColumn:(NSTableColumn *)tableColumn{
+    NSUInteger index = [possibleOptions indexOfObject:tableColumn.identifier];
+    
+    if([sorters[index] isEqual:@(0)]){
+        sorters[index] = @(2);
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:predicateKeys[index] ascending:YES];
+        [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        [_tableView setIndicatorImage:[NSImage imageNamed:@"NSDescendingSortIndicator"] inTableColumn:tableColumn];
+    }else if([sorters[index] isEqual:@(2)]){
+        sorters[index] = @(1);
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@",predicateKeys[index]];
+        [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+        NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc]initWithKey:predicateKeys[index] ascending:NO];
+        [sortDescriptors insertObject:sortDescriptor atIndex:0];
+        [_tableView setIndicatorImage:[NSImage imageNamed:@"NSAscendingSortIndicator"] inTableColumn:tableColumn];
+        
+    }else if([sorters[index] isEqual:@(1)]){
+        sorters[index] = @(0);
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@",predicateKeys[index]];
+        [sortDescriptors removeObject:[[sortDescriptors filteredArrayUsingPredicate:predicate] objectAtIndex:0]];
+        [_tableView setIndicatorImage:nil inTableColumn:tableColumn];
+    }
+    
+    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
+    [_tableView reloadData];
+}
+
+-(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
+    return mangaList.count;
+}
+
+-(void)rowDoubleClicked{
+    if([_tableView clickedRow] == -1){
+        return;
+    }
+    @try{
+        mangaWindow = [[MangaWindow alloc]initWithManga:[mangaList objectAtIndex:[_tableView clickedRow]] parent:self context:_managedObjectContext];
+    }@catch(NSException *e){
+        NSLog(@"Didn't click on row");
+    }
+    
+    
+    //mangaWindow.delegate = self;
 }
 
 -(void)updateTableColumns{
@@ -222,35 +381,29 @@
     [cellTF setBordered:NO];
     [cellTF setEditable:NO];
     [cellTF setDrawsBackground:NO];
-    Manga* manga = [mangaList objectAtIndex:row];
-    int columnIndex = [possibleOptions indexOfObject:tableColumn.identifier];
+    MangaEntity* manga = [mangaList objectAtIndex:row];
+    NSUInteger columnIndex = [possibleOptions indexOfObject:tableColumn.identifier];
     if (columnIndex==0){
-        result.textField.stringValue = [manga getTitle];
+        result.textField.stringValue = manga.title;
     }else if(columnIndex==1){
-        result.textField.stringValue = [manga getAuthor];
+        result.textField.stringValue = manga.author;
     }else if(columnIndex==2){
-        result.textField.stringValue = [manga getArtist];
+        result.textField.stringValue = manga.artist;
     }else if(columnIndex==3){
-        result.textField.stringValue = [manga getHost];
+        result.textField.stringValue = manga.host;
     }else if(columnIndex==4){
-        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumChapters]];
+        result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.chapterTotal integerValue]];
     }else if (columnIndex==5){
-        if([manga getStatus]==true){
+        if([manga.status isEqual:@(YES)]){
             result.textField.stringValue = @"Completed";
         }else{
             result.textField.stringValue = @"Ongoing";
         }
     }else if(columnIndex==6){
-        result.textField.stringValue = [NSString stringWithFormat:@"%i",(int)[manga getNumberToRead]];
+        result.textField.stringValue = [NSString stringWithFormat:@"%li",(long)[manga.unreadChapters integerValue]];
     }
     return result;
 }
-
--(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
-    return YES;
-}
-
-
 
 #pragma mark - Core Data stack
 
@@ -302,7 +455,7 @@
     if (!shouldFail && !error) {
         NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
         NSURL *url = [applicationDocumentsDirectory URLByAppendingPathComponent:@"OSXCoreDataObjC.storedata"];
-        if (![coordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]) {
+        if (![coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]) {
             coordinator = nil;
         }
         _persistentStoreCoordinator = coordinator;
