@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7549" systemVersion="14D136" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Chapter" representedClassName="Chapter" syncable="YES">
         <attribute name="addDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="chapterURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="index" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="manga" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="MangaEntity" inverseName="chapters" inverseEntity="MangaEntity" syncable="YES"/>
+        <relationship name="manga" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MangaEntity" inverseName="chapters" inverseEntity="MangaEntity" syncable="YES"/>
     </entity>
     <entity name="Genre" representedClassName="Genre" syncable="YES">
+        <attribute name="count" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="MangaEntity" representedClassName="MangaEntity" syncable="YES">
@@ -23,18 +24,20 @@
         <attribute name="status" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="unreadChapters" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <relationship name="chapters" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Chapter" inverseName="manga" inverseEntity="Chapter" syncable="YES"/>
-        <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" syncable="YES"/>
+        <relationship name="chapters" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Chapter" inverseName="manga" inverseEntity="Chapter" syncable="YES"/>
+        <relationship name="genres" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Genre" syncable="YES"/>
     </entity>
     <entity name="PreferenceEntity" representedClassName="PreferenceEntity" syncable="YES">
         <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="totalCount" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
-        <relationship name="totalGenres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" syncable="YES"/>
+        <relationship name="onlyIf" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Genre" syncable="YES"/>
+        <relationship name="onlyIfNot" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Genre" syncable="YES"/>
+        <relationship name="totalGenres" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Genre" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Chapter" positionX="261" positionY="-0" width="128" height="135"/>
-        <element name="Genre" positionX="99" positionY="63" width="128" height="58"/>
-        <element name="MangaEntity" positionX="-63" positionY="-18" width="128" height="240"/>
-        <element name="PreferenceEntity" positionX="99" positionY="90" width="128" height="90"/>
+        <element name="Chapter" positionX="207" positionY="-54" width="128" height="135"/>
+        <element name="Genre" positionX="45" positionY="225" width="128" height="73"/>
+        <element name="MangaEntity" positionX="-126" positionY="-45" width="128" height="240"/>
+        <element name="PreferenceEntity" positionX="369" positionY="159" width="128" height="120"/>
     </elements>
 </model>

@@ -2,7 +2,7 @@
 //  PreferenceEntity.h
 //  MangaStorage
 //
-//  Created by Sean Mullan on 3/27/15.
+//  Created by Sean Mullan on 4/29/15.
 //  Copyright (c) 2015 SilentLupin. All rights reserved.
 //
 
@@ -13,12 +13,24 @@
 
 @interface PreferenceEntity : NSManagedObject
 
-@property (nonatomic, retain) NSNumber * totalCount;
 @property (nonatomic, retain) NSDate * lastUpdated;
+@property (nonatomic, retain) NSNumber * totalCount;
+@property (nonatomic, retain) NSSet *onlyIf;
+@property (nonatomic, retain) NSSet *onlyIfNot;
 @property (nonatomic, retain) NSSet *totalGenres;
 @end
 
 @interface PreferenceEntity (CoreDataGeneratedAccessors)
+
+- (void)addOnlyIfObject:(Genre *)value;
+- (void)removeOnlyIfObject:(Genre *)value;
+- (void)addOnlyIf:(NSSet *)values;
+- (void)removeOnlyIf:(NSSet *)values;
+
+- (void)addOnlyIfNotObject:(Genre *)value;
+- (void)removeOnlyIfNotObject:(Genre *)value;
+- (void)addOnlyIfNot:(NSSet *)values;
+- (void)removeOnlyIfNot:(NSSet *)values;
 
 - (void)addTotalGenresObject:(Genre *)value;
 - (void)removeTotalGenresObject:(Genre *)value;

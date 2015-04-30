@@ -17,15 +17,23 @@
 @implementation AppDelegate
 
 
-
-
+//TODO - fix undo
+//-(void)windowDidResignMain:(NSNotification *)notification{
+//    NSLog(@"HERE");
+//    [_undoItem setEnabled:NO];
+//    [_redoItem setEnabled:NO];
+//}
+//-(void)windowDidBecomeKey:(NSNotification *)notification{
+//    [_undoItem setEnabled:YES];
+//    [_undoItem setEnabled:YES];
+//}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     mangaList = [[NSMutableArray alloc]initWithCapacity:10];
     
+    sortByGenre = NO;
     updatesOnly = NO;
-    
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [_tableView setDoubleAction:@selector(rowDoubleClicked)];
@@ -73,8 +81,7 @@
 }
 
 -(void)windowWillClose:(NSNotification *)notification{
-    mangaList = [[NSMutableArray alloc] initWithArray:[mangaList sortedArrayUsingDescriptors:sortDescriptors]];
-    [_tableView reloadData];
+    [self updateTableData];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -84,6 +91,8 @@
 -(BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender{
     return YES;
 }
+
+
 
 #pragma mark - Adding Window Methods
 - (IBAction)addButton:(id)sender {
@@ -100,8 +109,14 @@
     }
     for(Genre* genre in manga.genres){
         if([genreStrings containsObject:genre.title]){
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"title = %@",genre.title];
+            NSArray* oldGenres = [[NSArray alloc]init];
+            oldGenres = [[NSArray alloc]initWithArray:[[preference.totalGenres allObjects] filteredArrayUsingPredicate:predicate]];
+            Genre* oldGenre = [oldGenres objectAtIndex:0];
+            oldGenre.count = @([oldGenre.count integerValue]+1);
             continue;
         }
+        genre.count = @1;
         [preference addTotalGenresObject:genre];
     }
 
@@ -121,11 +136,32 @@
 
 - (IBAction)genreSortItemSelect:(id)sender {
     NSLog(@"Genre Sorting");
+    if(sortByGenre){
+        sortByGenre = false;
+        [sender setState:0];
+    }else{
+        sortByGenre = true;
+        [sender setState:1];
+
+    }
+    [self updateTableData];
+    
 }
 
 - (IBAction)genreSortEditItemSelect:(id)sender {
     NSLog(@"Genre Sort Pref");
+    genreWindow = [[GenreSortWindow alloc]initWithParent:self context:[self managedObjectContext]];
 }
+-(void)deleteExcludeGenre:(Genre* )genre{
+    NSLog(@"Delete Excluded");
+    [preference removeOnlyIfNotObject:genre];
+    NSError *error = nil;
+    [[self managedObjectContext] save:&error];
+}
+-(void)deleteIncludeGenre:(Genre*)genre{
+    [preference removeOnlyIfObject:genre];
+}
+
 
 
 - (IBAction)deleteItem:(id)sender {
@@ -133,11 +169,45 @@
     NSMutableArray *toRemove = [[NSMutableArray alloc]initWithCapacity:10];
     [indexSet enumerateIndexesUsingBlock:^(NSUInteger index, BOOL *stop) {
         //use index
+        MangaEntity* exManga = [mangaList objectAtIndex:index];
+        for(Genre* oldGenre in exManga.genres){
+            //
+            Genre* genre;
+            for(Genre* check in preference.totalGenres){
+                if(oldGenre.title == check.title){
+                    genre = check;
+                    break;
+                }
+            }
+            if(genre==nil){
+                NSLog(@"Error: Genre %@ does not exist in preferences",oldGenre.title);
+            }
+//TODO - Possible error when deleting
+            NSLog(@"here %@",genre.title);
+            genre.count = @([genre.count integerValue]-1);
+            if ([genre.count integerValue]<1){
+                [preference removeTotalGenresObject:genre];
+                if([preference.onlyIf containsObject:genre]){
+                    [preference removeOnlyIfObject:genre];
+                }
+                if([preference.onlyIfNot containsObject:genre]){
+                    [preference removeOnlyIfNotObject:genre];
+                }
+            }
+        }
+        
         [_managedObjectContext deleteObject:[mangaList objectAtIndex:index]];
         [toRemove addObject:[mangaList objectAtIndex:index]];
+        
+        
     }];
+
     for(NSObject *item in toRemove){
         [mangaList removeObject:item];
+    }
+    
+    for(Genre* genre in preference.totalGenres){
+        NSLog(@"%@ :%@",genre.title,genre.count);
     }
     [_tableView reloadData];
 }
@@ -239,6 +309,43 @@
     [_tableView reloadData];
 }
 
+
+-(void)updateTableData{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"MangaEntity" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    NSError *error = nil;
+    [fetchRequest setSortDescriptors:sortDescriptors];
+    for(Genre* item in preference.onlyIf){
+        NSLog(@"include %@",item.title);
+    }
+    for(Genre* item in preference.onlyIfNot){
+        NSLog(@"exclude %@",item.title);
+    }
+    if(sortByGenre==true){
+        NSMutableArray *predicateArray;
+        for (Genre* genre in preference.onlyIf){
+            //required genres
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ANY genres.title like '%@'",genre.title];
+            [predicateArray addObject:predicate];
+        }
+        for (Genre* genre in preference.onlyIfNot){
+            //ommitted genres
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"!(ANY genres.title like '%@')",genre.title];
+            [predicateArray addObject:predicate];
+        }
+        if([predicateArray count]>0){
+            NSPredicate *predicates = [NSCompoundPredicate andPredicateWithSubpredicates:predicateArray];
+            
+            [fetchRequest setPredicate:predicates];
+        }
+    }
+    
+    
+    mangaList = [[NSMutableArray alloc]initWithArray:[[self managedObjectContext] executeFetchRequest:fetchRequest error:&error]];
+    
+    [_tableView reloadData];
+}
 
 - (IBAction)showOnlyUpdates:(id)sender {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc]init];

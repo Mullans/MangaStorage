@@ -2,7 +2,7 @@
 //  Genre.h
 //  MangaStorage
 //
-//  Created by Sean Mullan on 3/24/15.
+//  Created by Sean Mullan on 3/28/15.
 //  Copyright (c) 2015 SilentLupin. All rights reserved.
 //
 
@@ -13,5 +13,6 @@
 @interface Genre : NSManagedObject
 
 @property (nonatomic, retain) NSString * title;
+@property (nonatomic, retain) NSNumber * count;
 
 @end

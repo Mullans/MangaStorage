@@ -2,7 +2,7 @@
 //  MangaEntity.m
 //  MangaStorage
 //
-//  Created by Sean Mullan on 3/27/15.
+//  Created by Sean Mullan on 4/29/15.
 //  Copyright (c) 2015 SilentLupin. All rights reserved.
 //
 
@@ -26,7 +26,6 @@
 @dynamic unreadChapters;
 @dynamic chapters;
 @dynamic genres;
-
 
 
 -(void)generateData:(NSURL *)mangaURL context:(NSManagedObjectContext *)context{

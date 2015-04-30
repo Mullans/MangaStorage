@@ -24,7 +24,7 @@
         myManga.artist = _artist.stringValue;
     }else if(sender==_numChapters){
         if([_numChapters integerValue]<1){
-            _numChapters.stringValue = myManga.chapterTotal;
+            _numChapters.stringValue = [myManga.chapterTotal stringValue];
             return;
         }
         myManga.chapterTotal = @([_numChapters integerValue]);
@@ -47,7 +47,9 @@
 
 -(BOOL)windowShouldClose:(id)sender{
     if(!toSave){
-        [_context deleteObject:myManga];
+        if(myManga!=nil){
+            [_context deleteObject:myManga];
+        }
     }
     return true;
 }

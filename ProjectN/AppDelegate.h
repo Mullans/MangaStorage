@@ -12,14 +12,16 @@
 #import "MangaEntity.h"
 #import "PreferenceEntity.h"
 #import "Genre.h"
+#import "GenreSortWindow.h"
 
 //TODO: make shown categories customizable
 //TODO: IMPORTANT implement coredata
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate, AddingWindowDelegate, NSWindowDelegate>{
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, NSTextFieldDelegate, AddingWindowDelegate, NSWindowDelegate,GenreSortWindowDelegate>{
     NSMutableArray *mangaList;
     AddingWindow *addWindow;
     MangaWindow *mangaWindow;
+    GenreSortWindow *genreWindow;
     NSMutableArray *columnOptions;
     NSArray *possibleOptions;
     NSArray *widths;
@@ -30,7 +32,7 @@
     NSArray *predicateKeys;
     
     bool updatesOnly;
-    
+    bool sortByGenre;
     PreferenceEntity *preference;
 }
 @property (weak) IBOutlet NSMenuItem *titleMenu;
@@ -41,6 +43,8 @@
 @property (weak) IBOutlet NSMenuItem *statusMenu;
 @property (weak) IBOutlet NSMenuItem *updatesMenu;
 @property (weak) IBOutlet NSMenuItem *ratingsMenu;
+@property (weak) IBOutlet NSMenuItem *undoItem;
+@property (weak) IBOutlet NSMenuItem *redoItem;
 
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;

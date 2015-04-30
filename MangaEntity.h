@@ -2,14 +2,13 @@
 //  MangaEntity.h
 //  MangaStorage
 //
-//  Created by Sean Mullan on 3/27/15.
+//  Created by Sean Mullan on 4/29/15.
 //  Copyright (c) 2015 SilentLupin. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import <Cocoa/Cocoa.h>
-
 
 @class Chapter, Genre;
 
@@ -44,5 +43,4 @@
 
 -(void)generateData:(NSURL *)mangaURL context:(NSManagedObjectContext *)context;
 -(void)updateChapters:(NSManagedObjectContext*)context;
-
 @end

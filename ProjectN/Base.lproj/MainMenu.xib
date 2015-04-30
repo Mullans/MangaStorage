@@ -19,10 +19,12 @@
                 <outlet property="hostingMenu" destination="cgS-LY-cFC" id="Ve3-kx-c7M"/>
                 <outlet property="numberMenu" destination="sZR-LZ-Pbo" id="jRF-LW-PMf"/>
                 <outlet property="ratingsMenu" destination="zdw-th-afp" id="eQ1-Y3-RbV"/>
+                <outlet property="redoItem" destination="6dh-zS-Vam" id="e9R-ks-8KR"/>
                 <outlet property="scrollView" destination="12J-Bq-RrF" id="PWn-Jj-Azc"/>
                 <outlet property="statusMenu" destination="oyE-W3-Jgb" id="sPp-SB-LFN"/>
                 <outlet property="tableView" destination="65h-DL-smn" id="tG3-dp-1G2"/>
                 <outlet property="titleMenu" destination="KbG-eu-iup" id="3by-8B-ICq"/>
+                <outlet property="undoItem" destination="dRJ-4n-Yzg" id="WMr-D0-2vd"/>
                 <outlet property="updatesMenu" destination="H3g-rd-QMn" id="ucf-Dh-PIB"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -152,7 +154,7 @@
                             <menuItem isSeparatorItem="YES" id="d62-SN-iTg"/>
                             <menuItem title="Undo" keyEquivalent="z" id="dRJ-4n-Yzg">
                                 <connections>
-                                    <action selector="undoItemSelect:" target="Voe-Tx-rLC" id="Ewr-Qe-dCf"/>
+                                    <action selector="undoItemSelect:" target="Voe-Tx-rLC" id="F5A-WM-lxo"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Redo" keyEquivalent="Z" id="6dh-zS-Vam">
@@ -430,7 +432,7 @@ CA
                     </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="428" y="426"/>
+            <point key="canvasLocation" x="428" y="451"/>
         </window>
     </objects>
 </document>
